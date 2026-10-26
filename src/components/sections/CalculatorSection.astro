@@ -1,0 +1,24 @@
+---
+import QuoteCalculator from '../calculator/QuoteCalculator.astro';
+import ProjectTerms from '../calculator/ProjectTerms.astro';
+import AdvisorCta from '../advisor/AdvisorCta.astro';
+---
+
+<section id="calculadora" class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="mono label"><b>04</b><span>Calculadora</span><span>Tu presupuesto</span></p>
+      <div>
+        <h2 class="h2">Configura tu proyecto<br />y obtén un estimado al instante.</h2>
+        <p class="lead sub">Selecciona los módulos que necesitas y adapta el proyecto a tu negocio. Los precios son estimados y pueden variar según la complejidad.</p>
+      </div>
+    </div>
+    <AdvisorCta />
+    <QuoteCalculator />
+    <ProjectTerms />
+  </div>
+</section>
+
+<style>
+  .sub { margin-top: 8px; max-width: 40rem; font-size: 12px; }
+</style>

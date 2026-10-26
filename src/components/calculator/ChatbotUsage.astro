@@ -1,0 +1,96 @@
+---
+import { defaultCommercialConfig, paymentCopy } from '../../data/commercial';
+import { moduleById } from '../../data/pricing';
+
+const scope = moduleById('chatbot')?.scope;
+const tiers = defaultCommercialConfig.chatbot.tiers;
+---
+
+<section aria-labelledby="sai" id="chatbot-step" hidden>
+  <h3 id="sai" class="step"><span class="mono">IA</span> Chatbot con IA · consumo estimado</h3>
+  <p class="hint"><strong>Implementación: desde $100.</strong> <strong>Consumo de inteligencia artificial: variable según uso.</strong></p>
+  <p class="hint">{paymentCopy.usageDisclaimer}</p>
+
+  <div class="tiers" role="radiogroup" aria-label="Volumen mensual de conversaciones">
+    {tiers.map((t) => (
+      <button type="button" role="radio" aria-checked="false" class="host tier" data-usage={t.id}>
+        <span class="n" data-tier-label>{t.label}</span>
+        <span class="p" data-tier-sub></span>
+      </button>
+    ))}
+  </div>
+
+  <div class="custom" id="usage-custom-box" hidden>
+    <label for="usage-custom">Conversaciones por mes</label>
+    <input id="usage-custom" type="number" inputmode="numeric" min="1" step="1" />
+  </div>
+
+  <div class="usage-out" id="usage-out" aria-live="polite" hidden>
+    <p class="big" id="usage-amount"></p>
+    <p class="fine" id="usage-detail"></p>
+    <p class="fine warn-limit" id="usage-limit" hidden></p>
+  </div>
+
+  <ul class="costs">
+    <li><b>Costo de inferencia</b>: lo que cobra el modelo de IA por procesar cada consulta. Es el único que estima esta calculadora.</li>
+    <li><b>Hosting</b>: el alojamiento se cotiza aparte (paso de Hosting).</li>
+    <li><b>Mantenimiento</b>: revisiones y ajustes, aparte.</li>
+    <li><b>Integraciones adicionales</b>: se cotizan como módulos adicionales.</li>
+  </ul>
+
+  {scope && (
+    <details class="scope">
+      <summary>Qué incluye y qué no el precio de implementación</summary>
+      <div class="scope-cols">
+        <div>
+          <b>Incluye</b>
+          <ul>{scope.included.map((i) => <li>{i}</li>)}</ul>
+        </div>
+        <div>
+          <b>No incluye (se cotiza aparte)</b>
+          <ul>{scope.excluded.map((i) => <li>{i}</li>)}</ul>
+        </div>
+      </div>
+    </details>
+  )}
+  <p class="fine">{paymentCopy.usageNotGuarantee} No incluye alojamiento, soporte ilimitado ni infraestructura.</p>
+</section>
+
+<style>
+  #chatbot-step[hidden] { display: none; }
+  .step { margin: 0 0 10px; font-size: 14px; font-weight: 700; display: flex; gap: 10px; align-items: baseline; }
+  .step .mono { color: var(--color-blue-ink); }
+  .hint { margin: 0 0 8px; font-size: 11.5px; color: var(--color-muted); line-height: 1.45; }
+  .tiers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .host {
+    background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 3px; text-align: left;
+    padding: 11px 12px; display: flex; flex-direction: column; gap: 4px; box-sizing: border-box; min-height: 44px;
+    transition: border-color .2s, background-color .2s;
+  }
+  .host:hover { border-color: var(--color-charcoal); }
+  .host[aria-checked='true'] { border-color: var(--color-blue); background: #eaf1ff; }
+  .host[aria-checked='true'] .n { color: var(--color-blue-ink); }
+  .n { font-size: 11.5px; font-weight: 600; }
+  .p { font-size: 11.5px; color: var(--color-muted); }
+  .custom { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; }
+  .custom[hidden] { display: none; }
+  .custom input { min-height: 40px; width: 140px; padding: 0 10px; border: 1px solid var(--color-line); border-radius: 3px; font: inherit; background: #fff; }
+  .custom input:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
+  .usage-out { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--color-line); border-radius: 3px; background: var(--color-surface); display: grid; gap: 4px; }
+  .usage-out[hidden] { display: none; }
+  .big { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .fine { margin: 0; font-size: 10.5px; color: var(--color-muted); line-height: 1.45; }
+  .warn-limit { color: #5c4a14; }
+  .costs { margin: 12px 0 0; padding-left: 16px; display: grid; gap: 3px; font-size: 11px; color: var(--color-muted); line-height: 1.4; }
+  .scope { margin-top: 10px; font-size: 11.5px; }
+  .scope summary { cursor: pointer; font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+  .scope-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-top: 6px; }
+  .scope ul { margin: 4px 0 0; padding-left: 16px; display: grid; gap: 2px; color: var(--color-muted); font-size: 11px; }
+  .scope + .fine { margin-top: 10px; }
+
+  @media (max-width: 767px) {
+    .tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .scope-cols { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 359px) { .tiers { grid-template-columns: 1fr; } }
+</style>

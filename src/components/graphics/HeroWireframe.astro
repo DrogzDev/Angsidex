@@ -1,0 +1,74 @@
+---
+/**
+ * Composición wireframe de cubos en proyección isométrica, generada en SVG.
+ * Cada arista es un <path pathLength="1"> para animarla con stroke-dashoffset.
+ */
+type Box = { x: number; y: number; z: number; w: number; d: number; h: number; faint?: boolean };
+
+const boxes: Box[] = [
+  { x: 0, y: 0, z: 0, w: 2, d: 2, h: 2 },
+  { x: 2, y: 0, z: 0, w: 2, d: 2, h: 1.4, faint: true },
+  { x: 0, y: 2, z: 0, w: 2, d: 1.6, h: 1.4, faint: true },
+  { x: 0.5, y: 0.5, z: 2, w: 1.5, d: 1.5, h: 1.5 },
+  { x: 2, y: 2, z: 0, w: 1.3, d: 1.3, h: 2.4 },
+  { x: -0.8, y: 0.6, z: 0, w: 0.8, d: 1.2, h: 3.2, faint: true },
+];
+
+const S = 46;
+const cos = Math.cos(Math.PI / 6);
+const sin = Math.sin(Math.PI / 6);
+const project = (x: number, y: number, z: number): [number, number] => [
+  +((x - y) * cos * S).toFixed(1),
+  +((x + y) * sin * S - z * S).toFixed(1),
+];
+
+type Edge = { d: string; faint: boolean };
+const edges: Edge[] = [];
+const nodes = new Map<string, [number, number]>();
+
+for (const b of boxes) {
+  const c = (dx: number, dy: number, dz: number) => {
+    const p = project(b.x + dx * b.w, b.y + dy * b.d, b.z + dz * b.h);
+    nodes.set(p.join(','), p);
+    return p;
+  };
+  const v = [
+    c(0, 0, 0), c(1, 0, 0), c(1, 1, 0), c(0, 1, 0),
+    c(0, 0, 1), c(1, 0, 1), c(1, 1, 1), c(0, 1, 1),
+  ];
+  const pairs = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
+  for (const [a, bIdx] of pairs) {
+    edges.push({ d: `M${v[a][0]} ${v[a][1]}L${v[bIdx][0]} ${v[bIdx][1]}`, faint: !!b.faint });
+  }
+}
+
+const all = [...nodes.values()];
+const minX = Math.min(...all.map((p) => p[0])) - 14;
+const maxX = Math.max(...all.map((p) => p[0])) + 14;
+const minY = Math.min(...all.map((p) => p[1])) - 14;
+const maxY = Math.max(...all.map((p) => p[1])) + 14;
+const blueIdx = new Set([3, 11, 19, 27, 34]);
+const nodeList = all.filter((_, i) => i % 2 === 0);
+---
+
+<svg
+  class="wire"
+  viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`}
+  role="img"
+  aria-label="Composición geométrica de cubos en wireframe"
+  fill="none"
+>
+  <g class="wire-g" stroke="#0E1114" stroke-linecap="round">
+    {edges.map((e) => <path d={e.d} pathLength="1" data-edge stroke-width={e.faint ? 0.6 : 0.9} opacity={e.faint ? 0.5 : 0.9} />)}
+  </g>
+  <g class="wire-nodes">
+    {nodeList.map(([x, y], i) => (
+      <circle cx={x} cy={y} r={blueIdx.has(i) ? 2.6 : 1.5} fill={blueIdx.has(i) ? '#3A86FF' : '#0E1114'} data-node />
+    ))}
+  </g>
+</svg>
+
+<style>
+  .wire { width: 100%; height: auto; overflow: visible; }
+  [data-edge] { stroke-dasharray: 1; stroke-dashoffset: 0; }
+</style>

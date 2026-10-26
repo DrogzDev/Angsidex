@@ -1,0 +1,55 @@
+---
+import Icon from '../Icon.astro';
+import { contactUrls, site } from '../../config/site';
+
+const channels = [
+  { key: 'instagram', label: 'Instagram', icon: 'camera', url: contactUrls.instagram, text: site.contact.instagram && `@${site.contact.instagram}` },
+  { key: 'tiktok', label: 'TikTok', icon: 'music', url: contactUrls.tiktok, text: site.contact.tiktok && `@${site.contact.tiktok}` },
+  { key: 'whatsapp', label: 'WhatsApp', icon: 'message-circle', url: contactUrls.whatsapp, text: site.contact.whatsapp && `+${site.contact.whatsapp}` },
+  { key: 'email', label: 'Email', icon: 'mail', url: contactUrls.email, text: site.contact.email },
+];
+---
+
+<section id="contacto" class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="mono label"><b>07</b><span>Hablemos</span></p>
+      <div class="wrap">
+        <div>
+          <h2 class="display title">¿Tienes un proyecto en mente?</h2>
+          <p class="lead">Cuéntanos tu idea y te ayudamos a hacerla realidad.</p>
+          <div class="actions">
+            {contactUrls.whatsapp
+              ? <a href={contactUrls.whatsapp} class="btn btn-dark" target="_blank" rel="noopener">Escríbenos por WhatsApp <Icon name="arrow-right" size={14} /></a>
+              : <a href="#calculadora" class="btn btn-dark">Configura tu presupuesto <Icon name="arrow-right" size={14} /></a>}
+            {contactUrls.email && <a href={contactUrls.email} class="btn">Enviar un email</a>}
+          </div>
+        </div>
+        <ul class="ch">
+          {channels.map((c) => (
+            <li>
+              {c.url
+                ? <a href={c.url} target={c.key === 'email' ? undefined : '_blank'} rel="noopener" class="chan"><Icon name={c.icon} size={18} /><b>{c.label}</b><span>{c.text}</span></a>
+                : <span class="chan off" aria-disabled="true"><Icon name={c.icon} size={18} /><b>{c.label}</b><span>Próximamente</span></span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+  .title { font-size: clamp(1.8rem, 3.2vw, 2.8rem); line-height: 1; }
+  .lead { margin: 10px 0 18px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .ch { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .chan { display: grid; gap: 3px; justify-items: start; padding: 12px; background: #fff; border: 1px solid var(--color-line); border-radius: 3px; min-height: 92px; box-sizing: border-box; align-content: start; transition: border-color .2s; }
+  a.chan:hover { border-color: var(--color-charcoal); }
+  .chan b { font-size: 11.5px; margin-top: 8px; }
+  .chan span { font-size: 10.5px; color: var(--color-muted); overflow-wrap: anywhere; }
+  .off { opacity: .6; border-style: dashed; }
+  @media (max-width: 1023px) { .wrap { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .ch { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

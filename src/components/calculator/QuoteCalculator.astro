@@ -1,0 +1,171 @@
+---
+import Icon from '../Icon.astro';
+import ModuleCard from './ModuleCard.astro';
+import QuoteSummary from './QuoteSummary.astro';
+import ChatbotUsage from './ChatbotUsage.astro';
+import { bases, billingPlans, billingRange, categories, costNotes, hostingOptions, maintenance, modules } from '../../data/pricing';
+import { site } from '../../config/site';
+
+const phone = import.meta.env.PUBLIC_WHATSAPP ?? site.contact.whatsapp ?? '';
+const apiBase = (import.meta.env.PUBLIC_API_URL as string | undefined)?.replace(/\/$/, '') ?? '';
+---
+
+<div class="calc" id="calc" data-phone={phone} data-api={apiBase}>
+  <div class="steps">
+    <section aria-labelledby="s1">
+      <h3 id="s1" class="step"><span class="mono">01</span> Tipo de proyecto</h3>
+      <div class="bases" role="radiogroup" aria-labelledby="s1">
+        {bases.map((b) => (
+          <button type="button" role="radio" aria-checked="false" class="base" data-base={b.id}>
+            <Icon name={b.icon} size={18} />
+            <span class="n">{b.name}</span>
+            <span class="p">${b.price} USD</span>
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="s2">
+      <h3 id="s2" class="step"><span class="mono">02</span> Funcionalidades</h3>
+      <div class="tabs" role="tablist" aria-label="Categorías de funcionalidades">
+        {categories.map((c, i) => (
+          <button type="button" role="tab" id={`tab-${c.id}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls="mods" data-tab={c.id} tabindex={i === 0 ? 0 : -1}>
+            {c.name} <span class="count" data-count={c.id} hidden></span>
+          </button>
+        ))}
+      </div>
+      <p class="hint" id="mods-hint">Elige primero un tipo de proyecto para habilitar las funcionalidades.</p>
+      <div class="mods" id="mods" role="tabpanel">
+        {modules.map((m) => <ModuleCard module={m} />)}
+      </div>
+
+      <div class="deps" id="dep-box" role="alert" hidden>
+        <p id="dep-text"></p>
+        <button type="button" class="btn btn-dark sm" id="dep-confirm">Agregar al presupuesto</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="s3b" id="billing-step" hidden>
+      <h3 id="s3b" class="step"><span class="mono">03</span> Facturación digital</h3>
+      <p class="hint">La facturación digital la configuramos y la gestionamos nosotros. Los planes van <strong>desde ${billingRange.min} hasta ${billingRange.max} al mes</strong>, según la magnitud de tu empresa. Elige el que corresponda: es un costo mensual fijo que se suma a tu presupuesto mensual.</p>
+      <div class="plans" role="radiogroup" aria-labelledby="s3b">
+        {billingPlans.map((p) => (
+          <button type="button" role="radio" aria-checked="false" class="host plan" data-billing={p.id}>
+            <span class="n">{p.name}</span>
+            <span class="p">${p.monthly}/mes · fijo</span>
+            <ul class="pf">{p.features.map((f) => <li>{f}</li>)}</ul>
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <ChatbotUsage />
+
+    <section aria-labelledby="s3">
+      <h3 id="s3" class="step"><span class="mono">04</span> Hosting</h3>
+      <div class="hosts" role="radiogroup" aria-labelledby="s3">
+        {hostingOptions.map((h) => (
+          <button type="button" role="radio" aria-checked="false" class="host" data-hosting={h.id}>
+            <span class="n">{h.name}</span>
+            <span class="p">{h.monthly === 0 ? 'Sin costo mensual con nosotros' : `${h.from ? 'Desde ' : ''}$${h.monthly}/mes`}</span>
+            <span class="d">{h.description}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="s4">
+      <h3 id="s4" class="step"><span class="mono">05</span> Mantenimiento</h3>
+      <button type="button" role="switch" aria-checked="false" class="host maint" id="maint">
+        <span class="n">{maintenance.name}</span>
+        <span class="p">Desde ${maintenance.monthly}/mes</span>
+        <span class="d">{maintenance.description}</span>
+      </button>
+      <ul class="notes">
+        {costNotes.map((n) => <li>{n}</li>)}      </ul>
+    </section>
+  </div>
+
+  <QuoteSummary />
+
+  <div class="bar" id="mbar" hidden>
+    <div class="bar-tot"><b id="bar-dev">$0 USD</b><span id="bar-mon" class="mono">+ $0/mes</span></div>
+    <a href="#quote-summary" class="btn btn-dark" id="bar-go">Ver resumen</a>
+  </div>
+</div>
+
+<style>
+  .calc { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 20px; align-items: start; }
+  .steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
+  .step { margin: 0 0 10px; font-size: 14px; font-weight: 700; display: flex; gap: 10px; align-items: baseline; }
+  .step .mono { color: var(--color-blue-ink); }
+
+  .bases { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .base, .host {
+    background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 3px;
+    text-align: left; padding: 11px 12px; display: flex; flex-direction: column; gap: 4px; box-sizing: border-box;
+    transition: border-color .2s, background-color .2s;
+  }
+  .base:hover, .host:hover { border-color: var(--color-charcoal); }
+  .base[aria-checked='true'], .host[aria-checked='true'] { border-color: var(--color-blue); background: #eaf1ff; }
+  .base[aria-checked='true'] { color: var(--color-blue-ink); }
+  .n { font-size: 11.5px; font-weight: 600; line-height: 1.25; }
+  .p { font-size: 11.5px; color: var(--color-muted); }
+  .base[aria-checked='true'] .p { color: var(--color-blue-ink); }
+  .d { font-size: 11px; color: var(--color-muted); line-height: 1.35; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button {
+    flex: none; min-height: 34px; padding: 0 14px; border: 1px solid var(--color-line); background: #e9e9e9;
+    border-radius: 3px; font-size: 11.5px; font-weight: 500; white-space: nowrap;
+  }
+  .tabs button[aria-selected='true'] { background: #fff; border-color: var(--color-blue); color: var(--color-blue-ink); }
+  .count { display: inline-grid; place-items: center; min-width: 16px; height: 16px; border-radius: 8px; background: var(--color-blue-ink); color: #fff; font-size: 9.5px; margin-left: 4px; }
+  .hint { margin: 0 0 10px; font-size: 11.5px; color: var(--color-muted); }
+  .hint[hidden] { display: none; }
+  .mods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .mods :global([data-module][hidden]) { display: none; }
+
+  .deps { margin-top: 10px; padding: 10px 12px; background: #fff7e6; border: 1px solid #ecd9a8; border-radius: 3px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .deps[hidden] { display: none; }
+  .deps p { margin: 0; font-size: 12px; line-height: 1.4; flex: 1 1 260px; color: #5c4a14; }
+  .sm { min-height: 34px; padding: 0 14px; font-size: 11.5px; }
+
+  .hosts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .pf { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px; font-size: 11px; color: var(--color-muted); line-height: 1.35; }
+  .pf li::before { content: '✓ '; color: var(--color-charcoal); }
+  .hint a { text-decoration: underline; text-underline-offset: 2px; }
+  .maint { width: 100%; max-width: 360px; }
+  .notes { margin: 12px 0 0; padding-left: 16px; font-size: 11px; color: var(--color-muted); display: grid; gap: 3px; }
+
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: #fff; border-top: 1px solid var(--color-line); padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+  }
+  .bar[hidden] { display: none; }
+  .bar-tot { display: grid; line-height: 1.2; }
+  .bar-tot b { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+  .bar .btn { min-height: 44px; }
+
+  @media (max-width: 1100px) {
+    .bases { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .mods, .hosts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 1023px) {
+    .calc { grid-template-columns: minmax(0, 1fr); }
+    .mods { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .hosts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (max-width: 767px) {
+    .mods, .bases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hosts, .plans { grid-template-columns: 1fr; }
+    .calc { padding-bottom: 64px; }
+  }
+  @media (max-width: 359px) { .mods, .bases { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import '../../scripts/calculator';
+</script>

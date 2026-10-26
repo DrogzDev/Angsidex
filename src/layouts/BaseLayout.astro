@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import AdvisorPanel from '../components/advisor/AdvisorPanel.astro';
+import { site } from '../config/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = 'Angside — Soluciones digitales a medida', description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).toString();
+const ogImage = new URL('/brand/logo_horizontal_light.svg', site.url).toString();
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f1f1f1" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary" />
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('js-anim');
+    </script>
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only">Saltar al contenido</a>
+    <Navbar />
+    <main id="contenido"><slot /></main>
+    <Footer />
+    <AdvisorPanel />
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

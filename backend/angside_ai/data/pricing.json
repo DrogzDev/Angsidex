@@ -1,0 +1,490 @@
+{
+  "bases": [
+    {
+      "id": "landing",
+      "name": "Landing page",
+      "price": 180,
+      "icon": "monitor",
+      "description": "Una página para presentar tu oferta y captar contactos.",
+      "includes": []
+    },
+    {
+      "id": "corporativa",
+      "name": "Web corporativa",
+      "price": 350,
+      "icon": "building-2",
+      "description": "Sitio de varias secciones para presentar tu empresa.",
+      "includes": []
+    },
+    {
+      "id": "catalogo",
+      "name": "Catálogo digital",
+      "price": 280,
+      "icon": "book-open",
+      "description": "Muestra tus productos y recibe consultas.",
+      "includes": []
+    },
+    {
+      "id": "tienda",
+      "name": "Tienda online",
+      "price": 550,
+      "icon": "shopping-bag",
+      "description": "Vende productos en línea con panel de gestión.",
+      "includes": [
+        "auth",
+        "data",
+        "pedidos",
+        "panel"
+      ]
+    },
+    {
+      "id": "sistema",
+      "name": "Sistema empresarial",
+      "price": 650,
+      "icon": "code-xml",
+      "description": "Sistema personalizado con acceso de usuarios y panel.",
+      "includes": [
+        "auth",
+        "data",
+        "panel"
+      ]
+    },
+    {
+      "id": "automatizacion",
+      "name": "Automatización independiente",
+      "price": 120,
+      "icon": "settings",
+      "description": "Automatiza una tarea repetitiva sin rehacer tu sistema.",
+      "includes": []
+    },
+    {
+      "id": "chatbot-ia",
+      "name": "Chatbot empresarial con IA",
+      "price": 100,
+      "from": true,
+      "icon": "bot",
+      "description": "Solo el asistente inteligente para tu negocio, sin rehacer tu página.",
+      "includes": [
+        "chatbot"
+      ],
+      "sameAs": "chatbot"
+    }
+  ],
+  "dependencies": {
+    "auth": {
+      "id": "auth",
+      "name": "Autenticación de usuarios",
+      "price": 80,
+      "reason": "Necesaria para controlar quién entra y con qué permisos."
+    },
+    "data": {
+      "id": "data",
+      "name": "Almacenamiento de datos",
+      "price": 100,
+      "reason": "Necesario para guardar y consultar registros de forma persistente."
+    }
+  },
+  "categories": [
+    {
+      "id": "ventas",
+      "name": "Clientes y ventas"
+    },
+    {
+      "id": "admin",
+      "name": "Administración"
+    },
+    {
+      "id": "fiscal",
+      "name": "Facturación y Venezuela"
+    },
+    {
+      "id": "integraciones",
+      "name": "Integraciones"
+    },
+    {
+      "id": "ia",
+      "name": "Inteligencia artificial"
+    }
+  ],
+  "modules": [
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp automatizado",
+      "category": "ventas",
+      "price": 150,
+      "icon": "message-circle",
+      "description": "Tu negocio responde en WhatsApp aunque no estés: saluda, contesta las preguntas frecuentes y avisa a tus clientes sobre sus pedidos o citas.",
+      "requires": [],
+      "notice": "Sujeto a las reglas de Meta; el uso de la API puede generar costos aparte."
+    },
+    {
+      "id": "crm",
+      "name": "CRM de clientes",
+      "category": "ventas",
+      "price": 180,
+      "icon": "users",
+      "description": "Una libreta digital de tus clientes: quién es cada uno, qué te ha comprado y cuándo te conviene volver a contactarlo.",
+      "requires": [
+        "data"
+      ],
+      "incompatibleWith": [
+        "landing"
+      ]
+    },
+    {
+      "id": "pedidos",
+      "name": "Gestión de pedidos",
+      "category": "ventas",
+      "price": 180,
+      "icon": "package",
+      "description": "Recibe todos los pedidos en un solo lugar y mira en qué etapa va cada uno: recibido, en preparación o entregado.",
+      "requires": [
+        "data"
+      ],
+      "incompatibleWith": [
+        "landing",
+        "corporativa"
+      ]
+    },
+    {
+      "id": "excel",
+      "name": "Importación de Excel",
+      "category": "admin",
+      "price": 100,
+      "icon": "file-spreadsheet",
+      "description": "Pasa tus listas de productos o clientes de Excel al sistema de una sola vez, sin escribirlas a mano.",
+      "requires": [],
+      "incompatibleWith": [
+        "landing"
+      ],
+      "notice": "Requiere definir columnas y formato de importación."
+    },
+    {
+      "id": "roles",
+      "name": "Usuarios y roles",
+      "category": "admin",
+      "price": 150,
+      "icon": "shield-check",
+      "description": "Decide quién puede ver o hacer qué: por ejemplo, que el vendedor registre ventas pero solo tú veas los reportes.",
+      "requires": [
+        "auth"
+      ],
+      "incompatibleWith": [
+        "landing"
+      ]
+    },
+    {
+      "id": "panel",
+      "name": "Panel administrativo",
+      "category": "admin",
+      "price": 180,
+      "icon": "layout-dashboard",
+      "description": "Una pantalla privada para cambiar textos, productos y precios tú mismo, sin depender de nadie.",
+      "requires": [
+        "auth"
+      ],
+      "incompatibleWith": [
+        "landing"
+      ]
+    },
+    {
+      "id": "inventario",
+      "name": "Inventario",
+      "category": "admin",
+      "price": 160,
+      "icon": "boxes",
+      "description": "Sabes cuánto tienes de cada producto, qué entra y qué sale, y te avisa cuando algo se está acabando.",
+      "requires": [
+        "data"
+      ],
+      "incompatibleWith": [
+        "landing",
+        "corporativa"
+      ]
+    },
+    {
+      "id": "facturacion",
+      "name": "Facturación digital",
+      "category": "fiscal",
+      "price": 180,
+      "icon": "receipt",
+      "description": "Emite las facturas de tus ventas desde el mismo sistema. Nosotros la configuramos y la gestionamos; tú eliges el plan según el tamaño de tu empresa.",
+      "requires": [
+        "data",
+        "auth"
+      ],
+      "incompatibleWith": [
+        "landing",
+        "corporativa"
+      ],
+      "notice": "Incluye el plan de facturación que elijas, con costo mensual fijo que cubre su gestión por parte de Angside. Las exigencias del SENIAT se evalúan por separado."
+    },
+    {
+      "id": "bcv",
+      "name": "Tasa BCV y USDT automática",
+      "category": "fiscal",
+      "price": 90,
+      "icon": "refresh-cw",
+      "description": "Tus precios en bolívares se actualizan solos con la tasa oficial del BCV y con la de USDT, sin que tengas que cambiarlos cada día.",
+      "requires": []
+    },
+    {
+      "id": "reportes",
+      "name": "Reportes y estadísticas",
+      "category": "fiscal",
+      "price": 120,
+      "icon": "bar-chart-3",
+      "description": "Resúmenes claros de tu negocio: cuánto vendes, qué se vende más y cómo vas frente al mes pasado.",
+      "requires": [
+        "data"
+      ],
+      "incompatibleWith": [
+        "landing"
+      ]
+    },
+    {
+      "id": "reservas",
+      "name": "Reservas y citas",
+      "category": "integraciones",
+      "price": 150,
+      "icon": "calendar-check",
+      "description": "Tus clientes eligen día y hora para su cita y tú la confirmas, sin coordinar todo por mensajes.",
+      "requires": [
+        "data"
+      ]
+    },
+    {
+      "id": "notificaciones",
+      "name": "Notificaciones",
+      "category": "integraciones",
+      "price": 90,
+      "icon": "bell",
+      "description": "Avisos automáticos por correo u otros canales: confirmaciones, recordatorios y novedades para tus clientes.",
+      "requires": [],
+      "notice": "Los servicios de envío de terceros pueden tener costos propios."
+    },
+    {
+      "id": "auditoria",
+      "name": "Auditoría de acciones",
+      "category": "integraciones",
+      "price": 100,
+      "icon": "scroll-text",
+      "description": "Un historial de quién hizo qué y cuándo dentro del sistema, para tener claridad y control.",
+      "requires": [
+        "data",
+        "auth"
+      ],
+      "incompatibleWith": [
+        "landing"
+      ]
+    },
+    {
+      "id": "chatbot",
+      "name": "Chatbot empresarial con inteligencia artificial",
+      "category": "ia",
+      "price": 100,
+      "from": true,
+      "icon": "bot",
+      "description": "Integra un asistente inteligente que responde preguntas de clientes, consulta información autorizada de tu negocio y ayuda a automatizar la atención.",
+      "requires": [],
+      "notice": "El precio es solo la implementación. El consumo de inteligencia artificial es un costo recurrente variable, aparte; hosting, mantenimiento e integraciones adicionales también se cotizan por separado.",
+      "scope": {
+        "included": [
+          "Widget básico integrado a la página",
+          "Personalización visual sencilla",
+          "Preguntas frecuentes",
+          "Respuestas basadas en información comercial proporcionada por el cliente",
+          "Configuración inicial del modelo",
+          "Límites de uso",
+          "Mensaje para solicitar atención humana"
+        ],
+        "excluded": [
+          "Integraciones personalizadas con ERP",
+          "Consulta de información sensible",
+          "Operaciones sobre inventarios",
+          "Cambios de pedidos",
+          "Integración oficial con WhatsApp",
+          "Múltiples sistemas externos",
+          "Desarrollo de herramientas a medida",
+          "Grandes cargas documentales o bases de conocimiento complejas"
+        ]
+      }
+    }
+  ],
+  "hostingOptions": [
+    {
+      "id": "externo",
+      "name": "Hosting externo del cliente",
+      "monthly": 0,
+      "description": "Usas tu propio proveedor. Coordinamos el despliegue."
+    },
+    {
+      "id": "vps-basico",
+      "name": "VPS básico administrado",
+      "monthly": 15,
+      "from": true,
+      "description": "Para proyectos pequeños."
+    },
+    {
+      "id": "vps-superior",
+      "name": "VPS administrado superior",
+      "monthly": 35,
+      "from": true,
+      "description": "Para sistemas con más carga."
+    },
+    {
+      "id": "xeon",
+      "name": "Servidor Xeon compartido",
+      "monthly": 65,
+      "from": true,
+      "needsEvaluation": true,
+      "description": "Sujeto a disponibilidad y evaluación previa."
+    }
+  ],
+  "maintenance": {
+    "name": "Mantenimiento básico",
+    "monthly": 25,
+    "description": "Revisiones y ajustes menores. No incluye hosting, dominio ni servicios de terceros."
+  },
+  "billingPlans": [
+    {
+      "id": "emprendedor",
+      "name": "Emprendedor",
+      "monthly": 20,
+      "features": [
+        "150 facturas de venta al mes",
+        "Hasta $10.000 en ventas mensuales",
+        "1 usuario (el dueño de la cuenta)",
+        "Facturación digital"
+      ]
+    },
+    {
+      "id": "pymes",
+      "name": "Pymes",
+      "monthly": 30,
+      "features": [
+        "1.500 facturas de venta al mes",
+        "Hasta $25.000 en ventas mensuales",
+        "Hasta 3 usuarios con roles y permisos",
+        "Facturación digital"
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "monthly": 55,
+      "features": [
+        "5.000 facturas de venta al mes",
+        "Sin límite de monto en ventas",
+        "Usuarios ilimitados con roles y permisos",
+        "Hasta 3 sucursales y facturación digital"
+      ]
+    }
+  ],
+  "billingRange": {
+    "min": 20,
+    "max": 55
+  },
+  "paymentSplit": {
+    "start": 0.5
+  },
+  "billingService": {
+    "name": "Facturación digital",
+    "blurb": "Si quieres facturación digital, la configuramos y la gestionamos nosotros."
+  },
+  "costNotes": [
+    "Hosting, dominio, mantenimiento, soporte técnico y servicios de terceros (como Meta) se presupuestan por separado del desarrollo.",
+    "Los precios son estimados iniciales y pueden variar según el alcance."
+  ],
+  "projectTerms": [
+    {
+      "title": "Pago en dos partes",
+      "text": "Una parte para arrancar el desarrollo y la otra al culminar, cuando ya ves todo funcionando."
+    },
+    {
+      "title": "El sistema es 100 % tuyo",
+      "text": "Una vez completado el pago, el sistema te pertenece: recibes el código y la documentación, y puedes contratar a otros programadores para mantenerlo o ampliarlo."
+    },
+    {
+      "title": "Todo por escrito",
+      "text": "El alcance, los pagos, los plazos y la propiedad del sistema quedan en una propuesta o contrato formal, conforme a la normativa venezolana aplicable."
+    },
+    {
+      "title": "Facturación digital y terceros",
+      "text": "La facturación digital la configuramos y la gestionamos nosotros (de $20 a $55 al mes según la magnitud de tu empresa). Hosting, dominio y servicios como WhatsApp se rigen por las condiciones de cada proveedor; el cumplimiento fiscal ante el SENIAT se evalúa aparte."
+    }
+  ],
+  "commercialDefaults": {
+    "cashDiscount": {
+      "enabled": true,
+      "percent": "23",
+      "minDevelopmentUsd": "0",
+      "excludedIds": []
+    },
+    "financingMinDevelopmentUsd": "0",
+    "plans": [
+      {
+        "id": "m3",
+        "enabled": true,
+        "termMonths": 3,
+        "surchargePercent": "10",
+        "initialPercent": "40",
+        "installments": 3,
+        "everyMonths": 1
+      },
+      {
+        "id": "m6",
+        "enabled": true,
+        "termMonths": 6,
+        "surchargePercent": "15",
+        "initialPercent": "40",
+        "installments": 6,
+        "everyMonths": 1
+      },
+      {
+        "id": "m9",
+        "enabled": true,
+        "termMonths": 9,
+        "surchargePercent": "20.833333",
+        "initialPercent": "40",
+        "installments": 3,
+        "everyMonths": 3
+      }
+    ],
+    "chatbot": {
+      "model": "z-ai/glm-5.3-flash-20260826",
+      "priceInPerM": "0.15",
+      "priceOutPerM": "0.50",
+      "ratesSource": "fallback",
+      "ratesUpdatedAt": null,
+      "queriesPerConversation": 4,
+      "inputTokensPerQuery": 1500,
+      "outputTokensPerQuery": 250,
+      "marginPercent": "0",
+      "monthlyLimitUsd": null,
+      "tiers": [
+        {
+          "id": "low",
+          "label": "Uso bajo",
+          "conversations": 100
+        },
+        {
+          "id": "medium",
+          "label": "Uso medio",
+          "conversations": 500
+        },
+        {
+          "id": "high",
+          "label": "Uso alto",
+          "conversations": 2000
+        },
+        {
+          "id": "custom",
+          "label": "Personalizado",
+          "conversations": 1000
+        }
+      ],
+      "customMaxConversations": 100000
+    }
+  }
+}

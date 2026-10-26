@@ -1,0 +1,56 @@
+---
+import Icon from '../Icon.astro';
+import type { ModuleOption } from '../../data/pricing';
+
+interface Props {
+  module: ModuleOption;
+}
+const { module: m } = Astro.props;
+---
+
+<button type="button" class="mod" data-module={m.id} data-category={m.category} aria-pressed="false">
+  <span class="top">
+    <Icon name={m.icon} size={18} />
+    <span class="check" aria-hidden="true"><Icon name="check" size={11} strokeWidth={3} /></span>
+  </span>
+  <span class="name">{m.name}</span>
+  <span class="price">
+    <span class="amount"><span class="from">{m.from ? 'Desde ' : ''}</span>${m.price} USD</span>
+    <span class="tag" data-tag></span>
+  </span>
+  <span class="sr-only" data-status-text></span>
+  {m.notice && <span class="note" title={m.notice}>{m.notice}</span>}
+</button>
+
+<style>
+  .mod {
+    display: flex; flex-direction: column; gap: 6px; text-align: left; min-height: 84px;
+    background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 3px;
+    padding: 11px 12px 10px; transition: border-color .2s, background-color .2s;
+    position: relative; box-sizing: border-box;
+  }
+  .mod:hover:not(:disabled) { border-color: var(--color-charcoal); }
+  .top { display: flex; justify-content: space-between; align-items: center; color: var(--color-charcoal); }
+  .check {
+    width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--color-blue); color: #fff; opacity: 0; transform: scale(.6); transition: opacity .15s, transform .15s;
+  }
+  .name { font-size: 11.5px; font-weight: 600; line-height: 1.25; }
+  .price { font-size: 11.5px; color: var(--color-muted); margin-top: auto; }
+  .from { font-size: 10px; }
+  .tag { display: none; font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: .05em; }
+  .note { display: none; font-size: 10.5px; line-height: 1.35; color: var(--color-muted); }
+
+  .mod[aria-pressed='true'] { background: #eaf1ff; border-color: var(--color-blue); color: var(--color-blue-ink); }
+  .mod[aria-pressed='true'] .top, .mod[aria-pressed='true'] .price { color: var(--color-blue-ink); }
+  .mod[aria-pressed='true'] .check { opacity: 1; transform: none; }
+  .mod[aria-pressed='true'] .note { display: block; }
+
+  .mod[data-status='included'] { background: #f7f7f7; border-style: dashed; cursor: default; }
+  .mod[data-status='included'] .tag, .mod[data-status='unavailable'] .tag { display: inline; }
+  .mod[data-status='included'] .amount { display: none; }
+  .mod[data-status='unavailable'] { opacity: .5; cursor: not-allowed; }
+  .mod[data-status='unavailable'] .amount { display: none; }
+
+  @media (hover: none) { .mod { min-height: 92px; } }
+</style>

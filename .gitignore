@@ -1,0 +1,47 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# environment variables (los .env.example sí se versionan)
+.env
+.env.*
+!.env.example
+
+# backend: entorno virtual, bases de datos locales y cachés de Python
+.venv/
+venv/
+backend/.venv/
+backend/.env
+backend/db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# capturas y archivos temporales de pruebas
+tools/_shots/
+calc.png
+*.tmp
+
+# Vercel
+.vercel/
+
+# editores y sistema
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,23 @@
+---
+import Icon from '../Icon.astro';
+const year = new Date().getFullYear();
+const home = Astro.url.pathname === '/' ? '' : '/';
+---
+
+<footer class="foot">
+  <div class="container row">
+    <a href={`${home}#inicio`} aria-label="Angside, inicio"><img src="/brand/logo_horizontal_light.svg" alt="Angside" width="96" height="29" loading="lazy" /></a>
+    <p class="mono">© {year} Angside. Soluciones digitales a medida.</p>
+    <nav class="legal mono" aria-label="Legal"><a href="/privacidad">Privacidad</a></nav>
+    <a href={`${home}#inicio`} class="top mono" aria-label="Volver arriba"><Icon name="arrow-up" size={14} /></a>
+  </div>
+</footer>
+
+<style>
+  .foot { border-top: 1px solid var(--color-line); padding-block: 18px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  img { height: 24px; width: auto; }
+  p { margin: 0; }
+  .legal a { text-decoration: underline; text-underline-offset: 2px; padding: 10px 4px; }
+  .top { display: grid; place-items: center; width: 36px; height: 36px; }
+</style>

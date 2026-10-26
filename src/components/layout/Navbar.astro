@@ -1,0 +1,127 @@
+---
+import Icon from '../Icon.astro';
+
+// En páginas internas (p. ej. /privacidad) los enlaces apuntan a la portada.
+const home = Astro.url.pathname === '/' ? '' : '/';
+const links = [
+  { href: `${home}#servicios`, label: 'Servicios' },
+  { href: `${home}#precios`, label: 'Precios' },
+  { href: `${home}#nosotros`, label: 'Nosotros' },
+  { href: `${home}#calculadora`, label: 'Calculadora' },
+  { href: `${home}#hosting`, label: 'Hosting' },
+  { href: `${home}#clientes`, label: 'Clientes' },
+  { href: `${home}#contacto`, label: 'Contacto' },
+];
+---
+
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href={`${home}#inicio`} class="logo" aria-label="Angside, inicio">
+      <img src="/brand/logo_horizontal_light.svg" alt="Angside" width="120" height="36" />
+    </a>
+
+    <nav class="links" aria-label="Principal">
+      {links.map((l) => <a href={l.href} data-nav-link>{l.label}</a>)}
+    </nav>
+
+    <a href={`${home}#contacto`} class="btn btn-dark cta">Hablemos <Icon name="arrow-right" size={14} /></a>
+
+    <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+      <Icon name="menu" size={22} class="i-open" />
+      <Icon name="x" size={22} class="i-close" />
+    </button>
+  </div>
+
+  <div class="mobile" id="mobile-menu" hidden>
+    <nav aria-label="Móvil">
+      {links.map((l) => <a href={l.href} data-nav-link>{l.label}</a>)}
+      <a href={`${home}#calculadora`} class="btn btn-dark">Calcular mi presupuesto <Icon name="arrow-right" size={14} /></a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgb(241 241 241 / 0.9);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s;
+  }
+  .nav.scrolled { border-bottom-color: var(--color-line); }
+  .nav-inner { height: var(--nav-h); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; }
+  .logo img { height: 36px; width: auto; margin-left: -8px; }
+  .links { display: flex; gap: clamp(14px, 2.2vw, 30px); }
+  .links a { font-size: 11px; font-weight: 500; color: var(--color-charcoal); padding: 6px 0; position: relative; }
+  .links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 2px; height: 1px; background: var(--color-charcoal); transform: scaleX(0); transform-origin: left; transition: transform .25s; }
+  .links a:hover::after, .links a.active::after { transform: scaleX(1); }
+  .cta { justify-self: end; min-height: 34px; padding: 0 16px; font-size: 11.5px; }
+  .burger { display: none; }
+  .mobile[hidden] { display: none; }
+
+  @media (max-width: 1023px) {
+    .nav-inner { grid-template-columns: 1fr auto; }
+    .links, .cta { display: none; }
+    .burger {
+      display: grid; place-items: center; width: 44px; height: 44px; margin-right: -10px;
+      background: none; border: 0;
+    }
+    .burger :global(.i-close), .burger[aria-expanded='true'] :global(.i-open) { display: none; }
+    .burger[aria-expanded='true'] :global(.i-close) { display: block; }
+    .mobile {
+      position: fixed; inset: var(--nav-h) 0 0 0; background: var(--color-bg);
+      padding: 12px var(--gutter) calc(24px + env(safe-area-inset-bottom)); overflow-y: auto;
+    }
+    .mobile nav { display: flex; flex-direction: column; }
+    .mobile nav a:not(.btn) { padding: 16px 0; font-size: 20px; font-weight: 600; border-bottom: 1px solid var(--color-line); }
+    .mobile nav .btn { margin-top: 24px; min-height: 48px; }
+  }
+</style>
+
+<script>
+  const nav = document.getElementById('nav')!;
+  const burger = document.getElementById('burger') as HTMLButtonElement;
+  const menu = document.getElementById('mobile-menu')!;
+
+  const setOpen = (open: boolean) => {
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    menu.hidden = !open;
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (open) menu.querySelector<HTMLElement>('a')?.focus();
+  };
+
+  burger.addEventListener('click', () => setOpen(burger.getAttribute('aria-expanded') !== 'true'));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) {
+      setOpen(false);
+      burger.focus();
+    }
+  });
+  matchMedia('(min-width: 1024px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  const onScroll = () => {
+    nav.classList.toggle('scrolled', scrollY > 8);
+    if (scrollY < 200) document.querySelectorAll('.links .active').forEach((l) => l.classList.remove('active'));
+  };
+  onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+
+  // Sección activa
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.links [data-nav-link]')];
+  const targets = links
+    .filter((a) => a.getAttribute('href')!.startsWith('#'))
+    .map((a) => ({ a, el: document.querySelector(a.getAttribute('href')!) }))
+    .filter((t): t is { a: HTMLAnchorElement; el: Element } => !!t.el);
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const en of entries) {
+        if (!en.isIntersecting) continue;
+        links.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${en.target.id}`));
+      }
+    },
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+  targets.forEach((t) => io.observe(t.el));
+</script>

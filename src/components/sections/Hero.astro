@@ -1,0 +1,116 @@
+---
+import Icon from '../Icon.astro';
+import HeroWireframe from '../graphics/HeroWireframe.astro';
+
+/** Datos verificables (sin cifras de clientes ni proyectos). */
+const facts = [
+  { title: 'Desde $120 USD', text: 'Precios claros desde el inicio' },
+  { title: 'Trato directo', text: 'Hablas con quien desarrolla' },
+  { title: 'Soporte continuo', text: 'Acompañamiento después del lanzamiento' },
+  { title: 'Hecho para Venezuela', text: 'Pensado en tu realidad local' },
+];
+---
+
+<section id="inicio" class="hero">
+  <div class="container">
+    <p class="mono eyebrow" data-hero>Ideas <span aria-hidden="true">→</span> Sistemas <span aria-hidden="true">→</span> Resultados</p>
+
+    <div class="grid">
+      <div class="copy">
+        <h1 class="display title" data-hero-title>
+          <span class="line"><span class="inner">Soluciones</span></span>
+          <span class="line"><span class="inner">Digitales</span></span>
+          <span class="line accent"><span class="inner">A medida</span></span>
+        </h1>
+        <p class="desc" data-hero>
+          Desarrollamos páginas web, tiendas online y sistemas personalizados para negocios en Venezuela que quieren crecer.
+        </p>
+        <div class="actions" data-hero>
+          <a href="#calculadora" class="btn btn-dark">Solicitar propuesta <Icon name="arrow-right" size={14} /></a>
+          <a href="#servicios" class="btn btn-ghost">
+            <span class="d">Ver nuestros servicios</span><span class="m">Ver servicios</span>
+            <Icon name="arrow-up-right" size={14} class="blue" />
+          </a>
+        </div>
+      </div>
+
+      <div class="art" aria-hidden="false">
+        <div class="art-inner" data-parallax>
+          <HeroWireframe />
+        </div>
+        <p class="mono side top">Estrategia<br />Diseño<br />Desarrollo<br />Implementación</p>
+        <p class="mono side bottom">Soluciones<br />que impulsan<br />tu negocio</p>
+      </div>
+    </div>
+
+    <ul class="facts" data-hero>
+      {facts.map((f) => (
+        <li>
+          <b>{f.title}</b>
+          <span>{f.text}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero { padding-top: clamp(10px, 2vw, 24px); padding-bottom: clamp(26px, 3.4vw, 44px); }
+  .eyebrow { margin: 0 0 clamp(8px, 1.2vw, 16px); font-size: 10px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); align-items: start; position: relative; }
+  /* La referencia usa glifos ~10% más anchos que Anton puro: se compensa con scaleX (no afecta el layout). */
+  .title { font-size: clamp(3.6rem, 8.9vw, 9.4rem); letter-spacing: 0.008em; transform: scaleX(1.1); transform-origin: left top; width: calc(100% / 1.1); }
+  .line { display: block; overflow: hidden; padding-block: 0.02em; }
+  .inner { display: block; }
+  .desc { margin: clamp(12px, 1.6vw, 20px) 0 0; max-width: 31rem; color: var(--color-muted); font-size: 13.5px; line-height: 1.55; }
+  .actions { display: flex; align-items: center; gap: 22px; margin-top: clamp(18px, 2.4vw, 32px); flex-wrap: wrap; }
+  .actions .btn-dark { min-height: 40px; padding-inline: 20px; }
+  .actions .btn-ghost { font-weight: 500; }
+  .actions :global(.blue) { color: var(--color-blue); }
+  .m { display: none; }
+
+  .art { position: relative; min-height: 100%; }
+  .art-inner { width: min(100%, 360px); margin: clamp(0px, 1vw, 12px) 0 0 clamp(8px, 4vw, 70px); will-change: transform; }
+  .side { position: absolute; margin: 0; font-size: 8.5px; line-height: 1.55; color: var(--color-muted); }
+  .side.top { right: 0; top: 18%; }
+  .side.bottom { right: 0; bottom: 4%; }
+
+  .facts {
+    list-style: none; padding: 0; margin: clamp(22px, 3vw, 38px) 0 0;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;
+  }
+  .facts b { display: block; font-size: 13.5px; font-weight: 700; }
+  .facts span { display: block; font-size: 11.5px; color: var(--color-muted); max-width: 16rem; line-height: 1.4; margin-top: 2px; }
+
+  @media (max-width: 1023px) {
+    .grid { grid-template-columns: 1fr; }
+    .art { min-height: 0; order: 2; margin-top: 12px; }
+    .art-inner { width: min(70%, 300px); margin-left: 0; }
+    .side.top { top: 8%; }
+    .side.bottom { bottom: 0; right: 4%; }
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  }
+  @media (max-width: 767px) {
+    /* Composición mobile: texto → datos → wireframe */
+    .hero .container { display: flex; flex-direction: column; }
+    .grid { display: contents; }
+    .eyebrow { order: 0; }
+    .copy { order: 1; }
+    .facts { order: 2; }
+    .art { order: 3; margin-top: 20px; }
+    .hero { padding-top: 8px; }
+    .title { font-size: clamp(3.2rem, 16.2vw, 5.4rem); }
+    .desc { font-size: 14.5px; max-width: none; }
+    .actions { gap: 12px; flex-wrap: nowrap; }
+    .actions .btn { min-height: 46px; }
+    .actions .btn-ghost { border: 1px solid var(--color-line); background: #fff; padding-inline: 18px; }
+    .actions .btn-ghost .ico { display: none; }
+    .d { display: none; } .m { display: inline; }
+    .art-inner { width: min(62%, 240px); }
+    .side { font-size: 8px; }
+    .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; order: 1; margin-top: 22px; }
+    .facts li:nth-child(n + 4) { display: none; }
+    .facts b { font-size: 13px; }
+    .facts span { font-size: 11px; }
+  }
+</style>

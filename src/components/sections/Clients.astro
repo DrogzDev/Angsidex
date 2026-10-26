@@ -1,0 +1,40 @@
+---
+import Icon from '../Icon.astro';
+---
+
+<section id="clientes" class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="mono label"><b>03</b><span>Nuestros clientes</span></p>
+      <div class="wrap">
+        <div class="copy">
+          <h2 class="display title">
+            Grandes<br />proyectos<br />empiezan con<br />el primero.
+          </h2>
+          <p class="display ask accent">¿Serás tú?</p>
+          <p class="lead">
+            Estamos construyendo nuestra primera cartera de clientes. Tu negocio puede ser el primero en formar parte de esta historia.
+          </p>
+          <a href="#calculadora" class="btn btn-dark">Sé nuestro primer cliente <Icon name="arrow-right" size={14} /></a>
+        </div>
+        <ol class="slots" aria-label="Espacios disponibles para futuros clientes">
+          <li class="slot first" aria-label="Primer espacio, disponible"><span class="mono">01 · Disponible</span></li>
+          {[2, 3, 4, 5, 6].map((n) => <li class="slot" aria-hidden="true"><span class="mono">0{n}</span></li>)}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+  .title { font-size: clamp(2.2rem, 4.2vw, 3.9rem); }
+  .ask { font-size: clamp(1.6rem, 2.6vw, 2.4rem); margin: 14px 0 16px; }
+  .lead { max-width: 28rem; margin-bottom: 20px; }
+  .slots { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .slot { aspect-ratio: 16 / 10; border: 1px dashed var(--color-steel); border-radius: 3px; display: grid; place-items: center; text-align: center; padding: 6px; }
+  .slot.first { border-style: solid; border-color: var(--color-blue); }
+  .slot.first .mono { color: var(--color-blue-ink); }
+  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

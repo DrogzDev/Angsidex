@@ -1,0 +1,53 @@
+---
+import Icon from '../Icon.astro';
+import { referencePrices } from '../../data/services';
+import { billingRange } from '../../data/pricing';
+---
+
+<section id="precios" class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="mono label"><b>06</b><span>Precios</span><span>referenciales</span></p>
+      <div>
+        <h2 class="h2">Precios orientativos por tipo de proyecto</h2>
+        <p class="lead sub">Cada proyecto es diferente. Estos son solo estimados de referencia, configurables y sujetos al alcance de cada proyecto.</p>
+      </div>
+    </div>
+
+    <ul class="grid">
+      {referencePrices.map((p) => (
+        <li class="card pc">
+          <Icon name={p.icon} size={20} />
+          <h3>{p.name}</h3>
+          <p class="price">{p.price}</p>
+          <ul class="inc">{p.includes.map((i) => <li><Icon name="check" size={11} />{i}</li>)}</ul>
+        </li>
+      ))}
+    </ul>
+
+    <p class="billing">
+      <Icon name="receipt" size={14} />
+      <span>
+        <b>Facturación digital:</b> la configuramos y la gestionamos nosotros, con planes desde ${billingRange.min} hasta ${billingRange.max} al mes según el tamaño de tu empresa. Es un costo mensual fijo y aparte del desarrollo.
+      </span>
+    </p>
+  </div>
+</section>
+
+<style>
+  .sub { margin-top: 8px; font-size: 12px; max-width: 36rem; }
+  .grid { list-style: none; margin: 0 0 0 132px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .pc { padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+  h3 { margin: 6px 0 0; font-size: 13.5px; font-weight: 700; }
+  .price { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--color-muted); padding-bottom: 8px; border-bottom: 1px solid var(--color-line); }
+  .inc { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 10.5px; color: var(--color-muted); }
+  .inc li { display: flex; gap: 6px; align-items: flex-start; line-height: 1.35; }
+  .inc :global(.ico) { margin-top: 2px; flex: none; color: var(--color-charcoal); }
+  .billing { margin: 14px 0 0 132px; display: flex; gap: 8px; align-items: flex-start; font-size: 11.5px; color: var(--color-muted); max-width: 52rem; }
+  .billing :global(.ico) { margin-top: 2px; flex: none; color: var(--color-charcoal); }
+  .billing a { color: var(--color-charcoal); text-decoration: underline; text-underline-offset: 2px; }
+  @media (max-width: 1100px) { .billing { margin-left: 0; } }
+  @media (max-width: 1100px) { .grid { margin-left: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 767px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 479px) { .grid { grid-template-columns: 1fr; } }
+</style>

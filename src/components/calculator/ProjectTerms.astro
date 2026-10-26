@@ -1,0 +1,30 @@
+---
+import Icon from '../Icon.astro';
+import { projectTerms } from '../../data/pricing';
+
+const icons = ['wallet', 'key-round', 'file-check', 'plug'];
+---
+
+<aside class="terms" aria-labelledby="terms-title">
+  <h3 id="terms-title" class="mono">Condiciones de tu proyecto</h3>
+  <ul>
+    {projectTerms.map((t, i) => (
+      <li class="card">
+        <Icon name={icons[i] ?? 'check'} size={18} />
+        <b>{t.title}</b>
+        <span>{t.text}</span>
+      </li>
+    ))}
+  </ul>
+</aside>
+
+<style>
+  .terms { margin-top: 28px; }
+  h3 { margin: 0 0 10px; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  li { padding: 14px; display: grid; gap: 6px; align-content: start; }
+  b { font-size: 12.5px; font-weight: 700; }
+  span { font-size: 11.5px; color: var(--color-muted); line-height: 1.45; }
+  @media (max-width: 1023px) { ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { ul { grid-template-columns: 1fr; } }
+</style>

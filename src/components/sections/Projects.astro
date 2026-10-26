@@ -1,0 +1,39 @@
+---
+import { ownProjects } from '../../data/projects';
+---
+
+{ownProjects.length > 0 && (
+  <section id="proyectos" class="section">
+    <div class="container">
+      <div class="section-head">
+        <p class="mono label"><b>—</b><span>Proyectos propios</span></p>
+        <div>
+          <h2 class="h2">Lo que construimos para nosotros</h2>
+          <p class="lead sub">Productos desarrollados por Angside. No son proyectos de clientes comerciales.</p>
+        </div>
+      </div>
+      <ul class="grid">
+        {ownProjects.map((p) => (
+          <li class="card">
+            {p.image && <img src={p.image} alt="" loading="lazy" />}
+            <div class="b">
+              <span class="mono">Proyecto propio</span>
+              <h3>{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.name}</a> : p.name}</h3>
+              <p>{p.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .grid { list-style: none; margin: 0 0 0 132px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .card img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+  .b { padding: 12px 14px 14px; display: grid; gap: 4px; }
+  h3 { margin: 0; font-size: 14px; }
+  p { margin: 0; font-size: 12px; color: var(--color-muted); }
+  @media (max-width: 1100px) { .grid { margin-left: 0; } }
+  @media (max-width: 767px) { .grid { grid-template-columns: 1fr; } }
+</style>

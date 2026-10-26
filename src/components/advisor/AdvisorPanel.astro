@@ -1,0 +1,349 @@
+---
+import Icon from '../Icon.astro';
+
+/** Asistente comercial. Solo se renderiza si hay backend configurado (PUBLIC_API_URL). */
+const enabled = !!import.meta.env.PUBLIC_API_URL;
+const sitekey = (import.meta.env.PUBLIC_TURNSTILE_SITEKEY as string | undefined) ?? '';
+
+const budgets = [
+  ['lt200', 'Menos de $200'],
+  ['200-500', '$200–$500'],
+  ['500-1000', '$500–$1.000'],
+  ['1000-3000', '$1.000–$3.000'],
+  ['gt3000', 'Más de $3.000'],
+  ['undefined', 'Todavía no tengo presupuesto definido'],
+];
+const starts = [
+  ['asap', 'Lo antes posible'],
+  ['1m', 'En el próximo mes'],
+  ['3m', 'En los próximos 3 meses'],
+  ['exploring', 'Solo estoy explorando'],
+];
+---
+
+{enabled && (
+  <button type="button" class="adv-bubble" data-open-advisor aria-label="Abrir el asesor de IA para cotizar tu proyecto">
+    <Icon name="message-square-text" size={18} />
+    <span><b>Asesor IA</b><small>Cotiza tu proyecto</small></span>
+  </button>
+)}
+
+{enabled && (
+  <div class="adv" id="advisor" data-sitekey={sitekey} hidden>
+    <div class="adv-backdrop" data-adv-close></div>
+    <section class="adv-panel" role="dialog" aria-modal="true" aria-labelledby="adv-title" tabindex="-1">
+      <header class="adv-head">
+        <div>
+          <p class="mono">Angside AI Advisor</p>
+          <h2 id="adv-title">Cuéntanos qué necesita tu negocio</h2>
+        </div>
+        <button type="button" class="adv-x" data-adv-close aria-label="Cerrar asistente"><Icon name="x" size={20} /></button>
+      </header>
+
+      <div class="adv-body">
+        <!-- Paso 1: formulario previo -->
+        <form id="adv-form" novalidate>
+          <p class="adv-intro">Antes de empezar, cuéntanos un poco sobre ti y tu proyecto. Así la conversación será útil desde el primer mensaje.</p>
+
+          <div class="adv-row">
+            <div class="adv-field">
+              <label for="adv-name">Nombre <span aria-hidden="true">*</span></label>
+              <input id="adv-name" name="name" type="text" autocomplete="name" maxlength="120" required />
+              <p class="adv-err" data-err="name" role="alert"></p>
+            </div>
+            <div class="adv-field">
+              <label for="adv-business">Negocio o proyecto <span aria-hidden="true">*</span></label>
+              <input id="adv-business" name="business" type="text" autocomplete="organization" maxlength="160" required />
+              <p class="adv-err" data-err="business" role="alert"></p>
+            </div>
+          </div>
+
+          <div class="adv-row">
+            <div class="adv-field">
+              <label for="adv-email">Correo electrónico</label>
+              <input id="adv-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" />
+              <p class="adv-err" data-err="email" role="alert"></p>
+            </div>
+            <div class="adv-field">
+              <label for="adv-phone">Teléfono</label>
+              <input id="adv-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="32" />
+              <p class="adv-err" data-err="phone" role="alert"></p>
+            </div>
+          </div>
+          <p class="adv-hint">Indica al menos un correo o un teléfono de contacto.</p>
+
+          <div class="adv-field">
+            <label for="adv-sector">Tipo de negocio o sector <span aria-hidden="true">*</span></label>
+            <input id="adv-sector" name="sector" type="text" maxlength="120" placeholder="Ej. panadería, consultorio, tienda de ropa" required />
+            <p class="adv-err" data-err="sector" role="alert"></p>
+          </div>
+
+          <div class="adv-field">
+            <label for="adv-need">¿Qué necesitas desarrollar o qué problema quieres resolver? <span aria-hidden="true">*</span></label>
+            <textarea id="adv-need" name="need" rows="4" maxlength="1500" required></textarea>
+            <p class="adv-err" data-err="need" role="alert"></p>
+          </div>
+
+          <details class="adv-more">
+            <summary>Datos opcionales <span>(ayudan a darte una mejor propuesta)</span></summary>
+            <div class="adv-row">
+              <div class="adv-field">
+                <label for="adv-whatsapp">WhatsApp</label>
+                <input id="adv-whatsapp" name="whatsapp" type="tel" inputmode="tel" maxlength="32" />
+                <p class="adv-err" data-err="whatsapp" role="alert"></p>
+              </div>
+              <div class="adv-field">
+                <label for="adv-location">Ciudad o país</label>
+                <input id="adv-location" name="location" type="text" maxlength="120" />
+              </div>
+            </div>
+            <div class="adv-row">
+              <div class="adv-field">
+                <label for="adv-has_website">¿Ya tienes página web?</label>
+                <select id="adv-has_website" name="has_website">
+                  <option value="">Prefiero no decir</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div class="adv-field">
+                <label for="adv-start_when">¿Cuándo quieres comenzar?</label>
+                <select id="adv-start_when" name="start_when">
+                  <option value="">Sin definir</option>
+                  {starts.map(([v, l]) => <option value={v}>{l}</option>)}
+                </select>
+              </div>
+            </div>
+            <div class="adv-field">
+              <label for="adv-budget_range">Presupuesto aproximado</label>
+              <select id="adv-budget_range" name="budget_range">
+                <option value="">Prefiero no decir</option>
+                {budgets.map(([v, l]) => <option value={v}>{l}</option>)}
+              </select>
+            </div>
+          </details>
+
+          <!-- Campo trampa antibots: las personas no lo ven -->
+          <div class="adv-trap" aria-hidden="true">
+            <label for="adv-website_url">No llenar</label>
+            <input id="adv-website_url" name="website_url" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <label class="adv-check">
+            <input type="checkbox" name="marketing_consent" />
+            <span>Autorizo a Angside a contactarme para seguimiento comercial y ofertas. <em>(Opcional)</em></span>
+          </label>
+
+          <p class="adv-legal">
+            Usaremos tus datos para responder tu consulta y preparar tu propuesta. Tus mensajes se procesan con un proveedor de IA para generar las respuestas.
+            Más información en la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.
+          </p>
+
+          <div id="adv-turnstile" class="adv-captcha"></div>
+          <p class="adv-err" data-err="turnstile_token" role="alert"></p>
+          <p class="adv-err adv-form-err" id="adv-form-error" role="alert"></p>
+
+          <button type="submit" class="btn btn-dark" id="adv-start">Empezar conversación <Icon name="arrow-right" size={14} /></button>
+        </form>
+
+        <!-- Paso 2: conversación -->
+        <div id="adv-chat" hidden>
+          <div class="adv-log" id="adv-log" role="log" aria-live="polite" aria-relevant="additions text" tabindex="0"></div>
+          <div class="adv-tools">
+            <button type="button" class="adv-link" id="adv-contact"><Icon name="phone-call" size={14} /> Quiero que Angside me contacte</button>
+            <span class="mono" id="adv-remaining"></span>
+          </div>
+          <form class="adv-composer" id="adv-composer">
+            <label for="adv-input" class="sr-only">Tu mensaje</label>
+            <textarea id="adv-input" rows="1" maxlength="1200" placeholder="Escribe tu mensaje…" enterkeyhint="send"></textarea>
+            <button type="submit" class="btn btn-dark" id="adv-send" aria-label="Enviar mensaje"><Icon name="send" size={16} /></button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+)}
+
+<style is:global>
+  .adv { position: fixed; inset: 0; z-index: 70; }
+  .adv[hidden] { display: none; }
+  .adv-backdrop { position: absolute; inset: 0; background: rgb(14 17 20 / .38); opacity: 0; transition: opacity .25s; }
+  .adv.open .adv-backdrop { opacity: 1; }
+
+  .adv-panel {
+    position: absolute; top: 0; right: 0; bottom: 0; width: min(500px, 100vw);
+    background: var(--color-bg); border-left: 1px solid var(--color-line);
+    display: flex; flex-direction: column; transform: translateX(100%); transition: transform .3s cubic-bezier(.22, 1, .36, 1);
+    outline: none; box-sizing: border-box;
+  }
+  .adv.open .adv-panel { transform: none; }
+
+  .adv-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--color-line); }
+  .adv-head h2 { margin: 4px 0 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; }
+  .adv-x { width: 44px; height: 44px; margin: -8px -10px 0 0; display: grid; place-items: center; background: none; border: 0; }
+  .adv-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .adv-body > form, .adv-body > #adv-chat { flex: 1; min-height: 0; }
+  #adv-form { overflow-y: auto; padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; overscroll-behavior: contain; }
+  #adv-chat { display: flex; flex-direction: column; }
+  #adv-chat[hidden], #adv-form[hidden] { display: none; }
+
+  .adv-intro { margin: 0; font-size: 12.5px; color: var(--color-muted); line-height: 1.5; }
+  .adv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .adv-field { display: grid; gap: 4px; min-width: 0; }
+  .adv-field label { font-size: 11.5px; font-weight: 600; }
+  .adv input[type='text'], .adv input[type='email'], .adv input[type='tel'], .adv select, .adv textarea {
+    width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; /* 16px evita el zoom automático en iOS */
+    color: var(--color-charcoal); background: #fff; border: 1px solid var(--color-line); border-radius: 3px; padding: 10px 11px; min-height: 44px;
+  }
+  .adv textarea { resize: vertical; min-height: 96px; line-height: 1.45; }
+  .adv input:focus, .adv select:focus, .adv textarea:focus { border-color: var(--color-charcoal); outline: 2px solid var(--color-blue); outline-offset: 1px; }
+  .adv [aria-invalid='true'] { border-color: #b3261e; }
+  .adv-err { margin: 0; min-height: 0; font-size: 11.5px; color: #b3261e; }
+  .adv-err:empty { display: none; }
+  .adv-hint { margin: -6px 0 0; font-size: 11px; color: var(--color-muted); }
+  .adv-more { border: 1px solid var(--color-line); border-radius: 3px; background: #fff; padding: 0 12px; }
+  .adv-more summary { cursor: pointer; padding: 12px 0; font-size: 12px; font-weight: 600; list-style: none; }
+  .adv-more summary::-webkit-details-marker { display: none; }
+  .adv-more summary span { font-weight: 400; color: var(--color-muted); }
+  .adv-more[open] summary { border-bottom: 1px solid var(--color-line); margin-bottom: 12px; }
+  .adv-more[open] { padding-bottom: 12px; display: grid; gap: 0; }
+  .adv-more .adv-row, .adv-more .adv-field { margin-bottom: 10px; }
+  .adv-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .adv-check { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; line-height: 1.45; cursor: pointer; }
+  .adv-check input { width: 18px; height: 18px; margin-top: 1px; flex: none; accent-color: var(--color-charcoal); }
+  .adv-check em { color: var(--color-muted); font-style: normal; }
+  .adv-legal { margin: 0; font-size: 11px; color: var(--color-muted); line-height: 1.5; }
+  .adv-legal a { color: var(--color-charcoal); text-decoration: underline; text-underline-offset: 2px; }
+  .adv-captcha { min-height: 0; }
+  #adv-start { min-height: 46px; width: 100%; }
+  #adv-start[disabled] { opacity: .55; }
+
+  /* Conversación */
+  .adv-log { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+  .adv-msg { max-width: 88%; padding: 10px 12px; font-size: 13.5px; line-height: 1.5; border-radius: 3px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .adv-msg.assistant { align-self: flex-start; background: #fff; border: 1px solid var(--color-line); }
+  .adv-msg.user { align-self: flex-end; background: var(--color-charcoal); color: #fff; }
+  .adv-msg.notice { align-self: stretch; max-width: none; background: #fff7e6; border: 1px solid #ecd9a8; color: #5c4a14; font-size: 12.5px; }
+  .adv-msg.typing::after { content: '…'; animation: adv-dots 1s steps(3, end) infinite; display: inline-block; width: 1em; overflow: hidden; vertical-align: bottom; }
+  @keyframes adv-dots { from { width: 0; } to { width: 1em; } }
+
+  /* Tarjetas de propuesta */
+  .adv-proposals { align-self: stretch; display: grid; gap: 10px; }
+  .adv-profile { background: #fff; border: 1px solid var(--color-line); border-radius: 3px; padding: 10px 12px; display: grid; gap: 8px; }
+  .adv-profile-line { margin: 0; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; font-size: 12px; }
+  .adv-profile-line .mono { font-size: 9px; }
+  .adv-profile-line span:not(.mono) { font-weight: 600; margin-right: 8px; }
+  .adv-profile .adv-link { justify-self: start; min-height: 32px; padding: 4px 0; }
+  .adv-profile-edit { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+  .adv-profile-edit .btn { min-height: 44px; padding: 0 14px; font-size: 12px; }
+  .adv-profile-note { grid-column: 1 / -1; margin: 0; font-size: 11px; color: var(--color-muted); line-height: 1.4; }
+  .adv-profile-edit .adv-err { grid-column: 1 / -1; }
+
+  .adv-card { background: #fff; border: 1px solid var(--color-line); border-radius: 3px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+  .adv-card.is-recommended { border-color: var(--color-blue); box-shadow: inset 0 2px 0 var(--color-blue); }
+  .adv-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .adv-card-head h3 { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+  .adv-badge { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--color-blue-ink); border: 1px solid var(--color-blue); border-radius: 2px; padding: 2px 6px; white-space: nowrap; }
+  .adv-card-meta { margin: -4px 0 0; display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: var(--color-muted); }
+  .adv-card-meta .mono { font-size: 9px; }
+  .adv-card-price { display: grid; gap: 3px; border-top: 1px solid var(--color-line); padding-top: 10px; }
+  .adv-card-price .mono { font-size: 9px; }
+  .adv-card-price b { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .adv-card-pay { margin: 0; display: grid; gap: 1px; font-size: 11.5px; color: var(--color-muted); }
+  .adv-fit { justify-self: start; margin-top: 4px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 2px; }
+  .adv-fit.ok { background: #e7f4ea; color: #1b5e2f; }
+  .adv-fit.over { background: #fff7e6; color: #5c4a14; }
+
+  .adv-card-payment { display: grid; gap: 8px; border-top: 1px solid var(--color-line); padding-top: 10px; }
+  .adv-card-payment > .mono { font-size: 9px; }
+  .adv-pay-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .adv-pay-mode { background: #fff; border: 1px solid var(--color-line); border-radius: 3px; text-align: left; padding: 8px 10px; min-height: 44px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box; transition: border-color .2s, background-color .2s; }
+  .adv-pay-mode:hover:not(:disabled) { border-color: var(--color-charcoal); }
+  .adv-pay-mode[aria-checked='true'] { border-color: var(--color-blue); background: #eaf1ff; }
+  .adv-pay-mode[aria-checked='true'] .n { color: var(--color-blue-ink); }
+  .adv-pay-mode:disabled { opacity: .5; cursor: not-allowed; }
+  .adv-pay-mode .n { font-size: 12px; font-weight: 700; }
+  .adv-pay-mode .p { font-size: 10.5px; color: var(--color-muted); line-height: 1.3; }
+  .adv-pay-detail { display: grid; gap: 4px; }
+  .adv-pay-row { margin: 0; display: flex; justify-content: space-between; gap: 10px; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .adv-pay-row span:last-child { white-space: nowrap; }
+  .adv-pay-row.muted { color: var(--color-muted); }
+  .adv-pay-row.total { font-weight: 700; border-top: 1px solid var(--color-line); padding-top: 4px; margin-top: 2px; }
+  .adv-pay-sched { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px; font-size: 11.5px; color: var(--color-muted); }
+  .adv-pay-sched li { display: flex; justify-content: space-between; gap: 10px; }
+  .adv-pay-sched b { color: var(--color-charcoal); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .adv-card-features summary { cursor: pointer; font-size: 12px; font-weight: 700; padding: 6px 0; min-height: 32px; display: flex; align-items: center; }
+  .adv-card-features ul, .adv-card-monthly ul, .adv-card-custom ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .adv-card-features li .row, .adv-card-monthly li { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; }
+  .adv-card-features li .row span:first-child { font-weight: 600; }
+  .adv-card .price { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--color-muted); }
+  .adv-card-features li.dep .row span:first-child { font-weight: 400; color: var(--color-muted); }
+  .adv-card .benefit { margin: 2px 0 0; font-size: 11.5px; color: var(--color-muted); line-height: 1.4; }
+
+  .adv-card-custom { background: #fff7e6; border: 1px solid #ecd9a8; border-radius: 3px; padding: 10px 12px; display: grid; gap: 6px; font-size: 12px; color: #5c4a14; }
+  .adv-card-custom ul { list-style: disc; padding-left: 16px; gap: 2px; }
+  .adv-card-custom p { margin: 0; font-size: 11.5px; line-height: 1.4; }
+
+  .adv-card-monthly { display: grid; gap: 6px; border-top: 1px solid var(--color-line); padding-top: 10px; }
+  .adv-card-monthly .mono { font-size: 9px; }
+  .adv-card-monthly .total { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--color-blue-ink); }
+  .adv-card-timeline { margin: 0; font-size: 11.5px; color: var(--color-muted); }
+  .adv-card-warn { margin: 0; font-size: 11.5px; color: #5c4a14; background: #fff7e6; border: 1px solid #ecd9a8; border-radius: 3px; padding: 6px 8px; }
+  .adv-card-note { margin: 0; font-size: 11px; color: var(--color-muted); line-height: 1.4; }
+
+  .adv-card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--color-line); padding-top: 10px; }
+  .adv-card-actions .btn { min-height: 44px; font-size: 12px; padding: 0 10px; white-space: normal; text-align: center; background: #fff; }
+  .adv-card-actions .btn-dark { background: var(--color-charcoal); }
+  .adv-card-actions .btn[disabled] { opacity: .6; }
+  .adv-card-actions .adv-link { grid-column: 1 / -1; justify-self: center; }
+
+  .adv-tools { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 18px; border-top: 1px solid var(--color-line); }
+  .adv-link { display: inline-flex; gap: 6px; align-items: center; background: none; border: 0; padding: 8px 0; min-height: 36px; font-size: 12px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .adv-link[disabled] { opacity: .5; text-decoration: none; }
+  .adv-composer { display: flex; gap: 8px; align-items: flex-end; padding: 8px 18px calc(14px + env(safe-area-inset-bottom)); }
+  .adv-composer textarea { min-height: 44px; max-height: 120px; resize: none; }
+  .adv-composer .btn { width: 46px; min-height: 46px; padding: 0; flex: none; }
+
+  html.adv-lock, html.adv-lock body { overflow: hidden; }
+
+  /* Burbuja del asesor: discreta y monocromática, sin gradientes ni brillos */
+  .adv-bubble {
+    position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 45;
+    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px 0 14px;
+    background: var(--color-charcoal); color: #fff; border: 1px solid var(--color-charcoal); border-radius: 999px;
+    box-shadow: 0 2px 10px rgb(14 17 20 / .18); transition: background-color .2s, transform .2s;
+  }
+  .adv-bubble:hover { background: var(--color-graphite); transform: translateY(-1px); }
+  .adv-bubble span { display: grid; text-align: left; line-height: 1.15; }
+  .adv-bubble b { font-size: 12.5px; font-weight: 700; }
+  .adv-bubble small { font-size: 10.5px; color: var(--color-mist); }
+  .adv-bubble .ico { flex: none; }
+  html.adv-lock .adv-bubble { display: none; }
+  /* En móvil, sube sobre la barra fija del cotizador cuando está visible */
+  html:has(#mbar:not([hidden])) .adv-bubble { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  @media (max-width: 767px) {
+    .adv-bubble { padding: 0 14px; }
+    .adv-bubble small { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .adv-bubble { transition: none; } }
+
+  @media (max-width: 767px) {
+    .adv-panel {
+      top: auto; left: 0; right: 0; bottom: 0; width: 100%; height: min(94dvh, 100% - env(safe-area-inset-top));
+      border-left: 0; border-top: 1px solid var(--color-line); border-radius: 10px 10px 0 0;
+      transform: translateY(100%);
+    }
+    .adv-row { grid-template-columns: 1fr; }
+    .adv-msg { max-width: 92%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .adv-panel, .adv-backdrop { transition: none; }
+  }
+</style>
+
+{enabled && (
+  <script>
+    import '../../scripts/advisor';
+  </script>
+)}

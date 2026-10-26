@@ -1,0 +1,188 @@
+---
+import Icon from '../Icon.astro';
+import { hostingCards, xeonLab } from '../../data/hosting';
+import { contactUrls } from '../../config/site';
+
+const saleMessage = `Hola Angside, me interesa comprar el equipo Xeon Lab ($${xeonLab.sale.price}) con el ${xeonLab.sale.systemDiscountPercent} % de descuento en el desarrollo de un sistema (el descuento aplica solo al sistema).`;
+const saleUrl = contactUrls.whatsapp ? `${contactUrls.whatsapp}?text=${encodeURIComponent(saleMessage)}` : '#contacto';
+---
+
+<section id="hosting" class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="mono label"><b>05</b><span>Hosting</span><span>y servidores</span></p>
+      <div>
+        <h2 class="h2">También te ayudamos con el hosting.</h2>
+        <p class="lead sub">Desarrollamos tu sistema y te ayudamos a encontrar la infraestructura adecuada para mantenerlo funcionando.</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <ul class="vps">
+        {hostingCards.map((h) => (
+          <li class="card pcard">
+            <h3>{h.name}</h3>
+            <p class="t">{h.tagline}</p>
+            <ul class="f">{h.features.map((f) => <li><Icon name="check" size={12} />{f}</li>)}</ul>
+            <div class="price"><span class="mono">Desde</span><strong>${h.monthly}/mes</strong></div>
+            <a href="#calculadora" class="btn btn-dark" data-pick-hosting={h.id}>{h.cta}</a>
+          </li>
+        ))}
+      </ul>
+
+      <article class="xeon" aria-labelledby="xeon-title">
+        <button type="button" class="shot-btn" data-open-xeon aria-haspopup="dialog" aria-label="Ver el equipo y sus especificaciones">
+          <img class="shot" src={xeonLab.image.src} alt={xeonLab.image.alt} width={xeonLab.image.width} height={xeonLab.image.height} loading="lazy" decoding="async" />
+          <span class="shot-tag mono">Ver equipo y specs</span>
+        </button>
+        <div class="body">
+          <h3 id="xeon-title">{xeonLab.name}</h3>
+          <p class="t">{xeonLab.tagline}</p>
+          <ul class="f">{xeonLab.features.map((f) => <li><Icon name="check" size={12} />{f}</li>)}</ul>
+          <div class="sale">
+            <p class="mono">Equipo a la venta</p>
+            <p class="sale-price"><strong>${xeonLab.sale.price}</strong><span>el equipo. Al comprarlo, te llevas {xeonLab.sale.systemDiscountPercent} % de descuento en el desarrollo de un sistema que corre en él sin problema.</span></p>
+            <p class="sale-eg">Ejemplo: un {xeonLab.sale.example.base.toLowerCase()} de ${xeonLab.sale.example.basePrice} queda en <b>${xeonLab.sale.example.discounted}</b> (ahorras ${xeonLab.sale.example.saving}). El equipo se paga completo.</p>
+            <p class="sale-note">{xeonLab.sale.note}</p>
+            <a href={saleUrl} class="btn light" target={contactUrls.whatsapp ? '_blank' : undefined} rel="noopener">Quiero el equipo</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <dialog id="xeon-dialog" class="xdlg" aria-labelledby="xeon-dlg-title">
+      <div class="xdlg-box">
+        <button type="button" class="xdlg-close" data-close-xeon aria-label="Cerrar">Cerrar</button>
+        <div class="gal">
+          <div class="stage">
+            {xeonLab.gallery.map((g, i) => (
+              <div class="slide" data-slide={i} hidden={i !== 0}>
+                {g.type === 'image'
+                  ? <img src={g.src} alt={xeonLab.image.alt} width={g.width} height={g.height} loading="lazy" decoding="async" />
+                  : <video src={g.src} poster={g.poster} width={g.width} height={g.height} controls muted playsinline preload="none" aria-label={g.label}></video>}
+              </div>
+            ))}
+          </div>
+          <ul class="thumbs" aria-label="Galería del equipo">
+            {xeonLab.gallery.map((g, i) => (
+              <li>
+                <button type="button" data-thumb={i} aria-label={g.label} aria-current={i === 0 ? 'true' : undefined}>
+                  <img src={g.poster} alt="" width="54" height="66" loading="lazy" decoding="async" />
+                  {g.type === 'video' && <span class="play" aria-hidden="true">▶</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="xdlg-info">
+          <p class="mono">Equipo a la venta</p>
+          <h3 id="xeon-dlg-title">{xeonLab.name}</h3>
+          <p class="xdlg-price"><strong>${xeonLab.sale.price}</strong><span>el equipo. Al comprarlo, te llevas {xeonLab.sale.systemDiscountPercent} % de descuento en el desarrollo de un sistema que corre en él.</span></p>
+          <p class="sale-eg">Ejemplo: un {xeonLab.sale.example.base.toLowerCase()} de ${xeonLab.sale.example.basePrice} queda en <b>${xeonLab.sale.example.discounted}</b> (ahorras ${xeonLab.sale.example.saving}). El equipo se paga completo.</p>
+          <dl class="specs">
+            {xeonLab.specs.map((s) => <><dt>{s.label}</dt><dd>{s.value}</dd></>)}
+          </dl>
+          <p class="sale-note">{xeonLab.sale.note}</p>
+          <a href={saleUrl} class="btn light" target={contactUrls.whatsapp ? '_blank' : undefined} rel="noopener">Quiero el equipo</a>
+        </div>
+      </div>
+    </dialog>
+
+    <p class="warn" role="note">
+      <Icon name="info" size={14} />
+      El alojamiento, dominio, mantenimiento y servicios de terceros se presupuestan por separado del desarrollo. Los recursos y condiciones de disponibilidad se especifican en cada propuesta.
+    </p>
+  </div>
+</section>
+
+<style>
+  .sub { margin-top: 8px; max-width: 36rem; font-size: 12px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 12px; align-items: stretch; }
+  .vps { list-style: none; margin: 0; padding: 0; align-content: start; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .pcard { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  h3 { margin: 0; font-size: 15px; font-weight: 700; }
+  .t { margin: 0; font-size: 12px; color: var(--color-muted); }
+  .f { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 11.5px; }
+  .f li { display: flex; gap: 8px; align-items: flex-start; }
+  .f :global(.ico) { margin-top: 3px; flex: none; color: var(--color-blue); }
+  .price { margin-top: auto; padding-top: 8px; }
+  .price .mono { display: block; font-size: 9px; }
+  .price strong { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .pcard .btn { min-height: 36px; font-size: 11.5px; }
+
+  .xeon { background: var(--color-charcoal); color: #fff; border-radius: 3px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+  .shot { display: block; width: 100%; aspect-ratio: 16 / 5; max-height: 130px; object-fit: cover; object-position: center 38%; background: var(--color-graphite); }
+  .sale { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--color-graphite); border-radius: 3px; }
+  .sale p { margin: 0; }
+  .sale-price { display: grid; gap: 4px; font-size: 12px; }
+  .sale-price strong { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .sale-eg, .xdlg-info .sale-eg { margin: 0; font-size: 12px; color: var(--color-mist); }
+  .sale-eg b { color: #fff; }
+  .sale-note { font-size: 10.5px; color: var(--color-steel); }
+  .body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .xeon .t, .xeon .mono { color: var(--color-steel); }
+  .xeon .f :global(.ico) { color: #fff; }
+  .light { background: #fff; color: var(--color-charcoal); border-color: #fff; min-height: 36px; font-size: 11.5px; }
+  .light:hover { background: var(--color-mist); }
+
+  .warn { margin: 14px 0 0; display: flex; gap: 8px; align-items: flex-start; font-size: 11.5px; color: var(--color-muted); max-width: 52rem; }
+  .warn :global(.ico) { margin-top: 2px; flex: none; }
+
+  @media (max-width: 1023px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .vps { grid-template-columns: 1fr; } }
+  .shot-btn { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .shot-tag { position: absolute; right: 8px; bottom: 8px; padding: 4px 8px; background: rgba(14, 17, 20, 0.78); color: #fff; border-radius: 3px; font-size: 9.5px; }
+  .shot-btn:hover .shot { filter: brightness(1.08); }
+
+  .xdlg { margin: auto; border: 0; padding: 0; background: transparent; width: min(880px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: visible; color: #fff; }
+  .xdlg::backdrop { background: rgba(14, 17, 20, 0.7); }
+  .xdlg-box { position: relative; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); background: var(--color-charcoal); border-radius: 3px; overflow: hidden; max-height: calc(100dvh - 24px); }
+  .gal { display: grid; grid-template-rows: minmax(0, 1fr) auto; background: #000; min-height: 0; max-height: calc(100dvh - 24px); }
+  .stage { display: grid; place-items: center; min-height: 0; }
+  .slide { width: 100%; height: 100%; display: grid; place-items: center; min-height: 0; }
+  .slide img, .slide video { width: 100%; height: 100%; max-height: calc(100dvh - 24px - 86px); object-fit: contain; background: #000; }
+  .thumbs { list-style: none; margin: 0; padding: 10px; display: flex; gap: 8px; justify-content: center; background: var(--color-charcoal); }
+  .thumbs button { position: relative; padding: 0; width: 54px; height: 66px; border: 2px solid transparent; border-radius: 3px; overflow: hidden; background: #000; cursor: pointer; opacity: .7; }
+  .thumbs button[aria-current='true'] { border-color: var(--color-blue); opacity: 1; }
+  .thumbs img { width: 100%; height: 100%; object-fit: cover; }
+  .play { position: absolute; inset: 0; display: grid; place-items: center; font-size: 14px; color: #fff; background: rgba(0, 0, 0, 0.35); }
+  .xdlg-info { padding: 22px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+  .xdlg-info .mono { color: var(--color-steel); }
+  .xdlg-info h3 { font-size: 18px; }
+  .xdlg-price { margin: 0; display: grid; gap: 2px; font-size: 12.5px; }
+  .xdlg-price strong { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .specs { margin: 0; display: grid; grid-template-columns: 112px 1fr; gap: 8px 12px; font-size: 12.5px; }
+  .specs dt { color: var(--color-steel); }
+  .specs dd { margin: 0; }
+  .xdlg-info .sale-note { margin: 0; font-size: 10.5px; color: var(--color-steel); }
+  .xdlg-close { position: absolute; top: 8px; right: 8px; z-index: 2; min-height: 36px; padding: 0 12px; border: 0; border-radius: 3px; background: rgba(14, 17, 20, 0.78); color: #fff; font-size: 12px; font-weight: 600; }
+  .xdlg-close:hover { background: var(--color-graphite); }
+  @media (max-width: 720px) {
+    .xdlg-box { grid-template-columns: 1fr; overflow-y: auto; }
+    .gal { max-height: none; display: block; }
+    .slide, .stage { height: auto; }
+    .slide img, .slide video { height: auto; max-height: 56dvh; }
+    .specs { grid-template-columns: 1fr; gap: 2px; }
+    .specs dd { margin-bottom: 8px; }
+  }
+</style>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>('#xeon-dialog');
+  document.querySelector('[data-open-xeon]')?.addEventListener('click', () => dlg?.showModal());
+  const slides = [...(dlg?.querySelectorAll<HTMLElement>('[data-slide]') ?? [])];
+  const thumbs = [...(dlg?.querySelectorAll<HTMLElement>('[data-thumb]') ?? [])];
+  const pauseAll = () => dlg?.querySelectorAll('video').forEach((v) => v.pause());
+  function show(i: number) {
+    pauseAll();
+    slides.forEach((s, n) => { s.hidden = n !== i; });
+    thumbs.forEach((t, n) => (n === i ? t.setAttribute('aria-current', 'true') : t.removeAttribute('aria-current')));
+  }
+  dlg?.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const thumb = t.closest<HTMLElement>('[data-thumb]');
+    if (thumb) return show(Number(thumb.dataset.thumb));
+    if (t === dlg || t.closest('[data-close-xeon]')) dlg.close();
+  });
+  dlg?.addEventListener('close', () => { pauseAll(); show(0); });
+</script>

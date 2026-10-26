@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { contactUrls, site } from '../config/site';
+
+/** BORRADOR: revisar con asesoría legal antes de publicar. La versión debe coincidir con PRIVACY_POLICY_VERSION del backend. */
+const version = '2026-10';
+const contact = site.contact.email ? { text: site.contact.email, href: contactUrls.email } : null;
+---
+
+<BaseLayout title="Política de privacidad — Angside" description="Cómo Angside trata los datos personales de quienes usan el asistente de IA y el cotizador.">
+  <article class="container legal">
+    <p class="mono">Versión {version}</p>
+    <h1 class="h2">Política de privacidad</h1>
+    <p class="lead">Esta política explica qué datos recopilamos cuando usas el asistente de IA de Angside y el cotizador, para qué los usamos y qué derechos tienes.</p>
+
+    <h2>Qué datos recopilamos</h2>
+    <ul>
+      <li>Los que escribes en el formulario previo: nombre, negocio o proyecto, correo y/o teléfono, sector y necesidad. Opcionalmente: WhatsApp, ciudad o país, si tienes página web, presupuesto aproximado y cuándo quieres comenzar.</li>
+      <li>El contenido de tu conversación con el asistente y las propuestas que genera.</li>
+      <li>Datos técnicos mínimos de seguridad, como una huella (hash) de tu dirección IP para prevenir abuso. No guardamos tu IP en claro en los registros de límites.</li>
+    </ul>
+
+    <h2>Para qué los usamos</h2>
+    <ul>
+      <li>Responder tu consulta y preparar una propuesta o presupuesto.</li>
+      <li>Contactarte cuando lo solicitas desde el asistente.</li>
+      <li>Seguimiento comercial y ofertas, <strong>solo si marcas la casilla de autorización</strong>, que es opcional y nunca viene marcada.</li>
+      <li>Proteger el servicio contra automatización y abuso.</li>
+    </ul>
+
+    <h2>Proveedores que intervienen</h2>
+    <ul>
+      <li><strong>Proveedores de inteligencia artificial contratados por Angside:</strong> reciben tus mensajes para generar las respuestas.</li>
+      <li><strong>Cloudflare Turnstile:</strong> verifica que quien usa el formulario es una persona.</li>
+    </ul>
+    <p>No vendemos tus datos. No pidas ni escribas en el chat contraseñas, datos de tarjetas ni información sensible.</p>
+
+    <h2>Conservación</h2>
+    <p>Conservamos los datos mientras sean necesarios para atender tu solicitud y la relación comercial, y puedes pedir que los eliminemos en cualquier momento.</p>
+
+    <h2>Tus derechos</h2>
+    <p>Puedes solicitar acceso, corrección o eliminación de tus datos, y revocar la autorización de contacto comercial cuando quieras.
+      {contact
+        ? <>Escríbenos a <a href={contact.href}>{contact.text}</a>.</>
+        : <> El canal de contacto se publicará aquí próximamente.</>}
+    </p>
+
+    <h2>Cambios</h2>
+    <p>Si actualizamos esta política, cambiaremos la versión indicada arriba.</p>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 46rem; padding-block: clamp(28px, 5vw, 56px); display: grid; gap: 12px; }
+  .legal :global(h1) { margin: 4px 0 0; }
+  h2 { margin: 18px 0 0; font-size: 15px; font-weight: 700; }
+  p, li { font-size: 13.5px; line-height: 1.6; color: var(--color-muted); margin: 0; }
+  ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  strong { color: var(--color-charcoal); }
+  a { color: var(--color-charcoal); text-decoration: underline; text-underline-offset: 2px; }
+</style>
