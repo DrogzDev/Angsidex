@@ -157,6 +157,7 @@ function init(root: HTMLElement) {
         sitekey,
         theme: 'light',
         language: 'es',
+        size: window.matchMedia('(max-width: 359px)').matches ? 'compact' : 'normal',
         callback: (token: string) => { tsToken = token; setError('turnstile_token', ''); },
         'expired-callback': () => { tsToken = ''; },
         'error-callback': () => { tsToken = ''; },

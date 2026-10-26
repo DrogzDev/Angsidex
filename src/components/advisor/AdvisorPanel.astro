@@ -214,7 +214,10 @@ const starts = [
   .adv-check em { color: var(--color-muted); font-style: normal; }
   .adv-legal { margin: 0; font-size: 11px; color: var(--color-muted); line-height: 1.5; }
   .adv-legal a { color: var(--color-charcoal); text-decoration: underline; text-underline-offset: 2px; }
-  .adv-captcha { min-height: 0; }
+  /* El widget de Turnstile es un iframe de 65 px: sin esto el flex lo encogía a 0 y tapaba el botón */
+  #adv-form > * { flex-shrink: 0; }
+  .adv-captcha { min-height: 65px; max-width: 100%; }
+  .adv-captcha:empty { min-height: 0; }
   #adv-start { min-height: 46px; width: 100%; }
   #adv-start[disabled] { opacity: .55; }
 
