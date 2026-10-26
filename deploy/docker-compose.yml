@@ -1,0 +1,53 @@
+# Angside en el VPS: proyecto Docker propio ("angside"), red propia y SIN puertos publicados.
+# Solo el túnel de Cloudflare sale hacia internet; no interfiere con otros proyectos del servidor.
+# Uso: cp .env.example .env  →  editar .env  →  docker compose up -d
+name: angside
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - angside_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    networks: [angside_net]
+
+  web:
+    build: ../backend
+    image: angside-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # POSTGRES_PASSWORD debe ser hexadecimal (openssl rand -hex 24) para no necesitar escapes en la URL.
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    networks: [angside_net]
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    depends_on:
+      - web
+    networks: [angside_net]
+
+networks:
+  angside_net:
+    name: angside_net
+
+volumes:
+  angside_pgdata:

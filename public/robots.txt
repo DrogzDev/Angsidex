@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Sitemap: https://angside.example/sitemap-index.xml
+Sitemap: https://angsidex.com/sitemap-index.xml

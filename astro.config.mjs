@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://angside.example',
+  site: 'https://angsidex.com',
   integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
   vite: { plugins: [tailwindcss()] },
 });

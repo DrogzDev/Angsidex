@@ -45,3 +45,9 @@ calc.png
 Thumbs.db
 .idea/
 .vscode/
+
+# despliegue
+deploy/backups/
+deploy/.env
+backend/staticfiles/
+

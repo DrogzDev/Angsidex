@@ -2,6 +2,8 @@
 import os
 from pathlib import Path
 
+from . import database
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -59,6 +61,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'config.middleware.ApiNoStoreMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -88,11 +92,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
+# En producción: DATABASE_URL=postgres://usuario:clave@db:5432/angside. Sin ella se usa SQLite (desarrollo y pruebas).
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': env('DJANGO_DB_PATH', str(BASE_DIR / 'db.sqlite3')),
-    }
+    'default': database.from_url(env('DATABASE_URL')) if env('DATABASE_URL') else database.sqlite(env('DJANGO_DB_PATH', str(BASE_DIR / 'db.sqlite3')))
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -107,6 +109,13 @@ TIME_ZONE = 'America/Caracas'
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
+}
+# Ruta del admin de Django; en producción conviene una distinta de la predeterminada.
+ADMIN_URL = env('DJANGO_ADMIN_URL', 'admin/').strip('/') + '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --- API / CORS ---
@@ -133,6 +142,7 @@ CORS_ALLOW_METHODS = ['GET', 'POST', 'PATCH', 'OPTIONS']
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = env_bool('DJANGO_SSL_REDIRECT', True)
+    SECURE_REDIRECT_EXEMPT = [r'^healthz$']  # los chequeos de salud internos llegan por HTTP
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
@@ -152,7 +162,7 @@ AI_MODEL = env('OPENROUTER_MODEL', 'z-ai/glm-5.3-flash-20260826')
 AI_REASONING_EFFORT = env('AI_REASONING_EFFORT', 'low')  # '', 'low', 'medium', 'high'
 AI_MAX_PROPOSAL_ROUNDS = int(env('AI_MAX_PROPOSAL_ROUNDS', '6'))
 AI_FALLBACK_MODELS = env_list('OPENROUTER_FALLBACK_MODELS', '')
-AI_SITE_URL = env('AI_SITE_URL', 'https://angside.example')
+AI_SITE_URL = env('AI_SITE_URL', 'https://angsidex.com')
 AI_SITE_NAME = 'Angside'
 
 # --- Límites y costos ---

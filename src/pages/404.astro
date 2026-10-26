@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Página no encontrada — Angside" description="La página que buscas no existe.">
+  <section class="container nf">
+    <p class="mono">Error 404</p>
+    <h1 class="h2">No encontramos esa página.</h1>
+    <p class="lead">Puede que el enlace haya cambiado. Vuelve al inicio o configura tu presupuesto.</p>
+    <p class="actions">
+      <a href="/" class="btn btn-dark">Ir al inicio</a>
+      <a href="/#calculadora" class="btn">Configurar presupuesto</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf { padding-block: clamp(72px, 14vw, 160px); display: grid; gap: 14px; justify-items: start; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 0; }
+</style>

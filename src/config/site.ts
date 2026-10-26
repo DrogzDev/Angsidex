@@ -4,8 +4,8 @@
  */
 export const site = {
   name: 'Angside',
-  /** PENDIENTE: dominio definitivo (se usa en canonical, sitemap y Open Graph). */
-  url: 'https://angside.example',
+  /** Dominio público (se usa en canonical, sitemap y Open Graph). */
+  url: 'https://angsidex.com',
   description:
     'Estudio de desarrollo de software: páginas web, tiendas online y sistemas personalizados para negocios en Venezuela.',
   contact: {

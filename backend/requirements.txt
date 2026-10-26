@@ -2,3 +2,7 @@ Django>=6.1,<6.2
 djangorestframework>=3.18,<3.19
 django-cors-headers>=4.9,<5
 httpx>=0.28,<1
+# Producción
+gunicorn>=23,<24
+psycopg[binary]>=3.2,<4
+whitenoise>=6.9,<7
