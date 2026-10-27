@@ -167,11 +167,17 @@ AI_SITE_NAME = 'Angside'
 
 # --- Límites y costos ---
 AI_MAX_USER_MESSAGES_PER_SESSION = int(env('AI_MAX_USER_MESSAGES_PER_SESSION', '20'))
-AI_MAX_TOKENS_PER_SESSION = int(env('AI_MAX_TOKENS_PER_SESSION', '30000'))
+# Cada ronda reenvía el catálogo completo (~7k tokens de entrada): 30k se agotaba antes de la primera propuesta.
+AI_MAX_TOKENS_PER_SESSION = int(env('AI_MAX_TOKENS_PER_SESSION', '80000'))
+AI_MAX_COST_PER_SESSION_USD = float(env('AI_MAX_COST_PER_SESSION_USD', '0.06'))
+# Cuota diaria por IP (suma de todas sus conversaciones) y strikes por mensajes ajenos al negocio.
+AI_MAX_TOKENS_PER_IP_DAY = int(env('AI_MAX_TOKENS_PER_IP_DAY', '200000'))
+AI_MAX_COST_PER_IP_DAY_USD = float(env('AI_MAX_COST_PER_IP_DAY_USD', '0.12'))
+AI_MAX_OFFTOPIC_STRIKES = int(env('AI_MAX_OFFTOPIC_STRIKES', '3'))
 AI_MAX_OUTPUT_TOKENS = int(env('AI_MAX_OUTPUT_TOKENS', '1500'))
 AI_MAX_USER_MESSAGE_CHARS = int(env('AI_MAX_USER_MESSAGE_CHARS', '1200'))
-AI_DAILY_BUDGET_USD = float(env('AI_DAILY_BUDGET_USD', '2.00'))
-AI_MONTHLY_BUDGET_USD = float(env('AI_MONTHLY_BUDGET_USD', '30.00'))
+AI_DAILY_BUDGET_USD = float(env('AI_DAILY_BUDGET_USD', '0.50'))
+AI_MONTHLY_BUDGET_USD = float(env('AI_MONTHLY_BUDGET_USD', '3.00'))
 # Respaldo si OpenRouter no informa el costo (USD por millón de tokens).
 AI_PRICE_IN_PER_M = float(env('AI_PRICE_IN_PER_M', '0.15'))
 AI_PRICE_OUT_PER_M = float(env('AI_PRICE_OUT_PER_M', '0.50'))
@@ -195,7 +201,7 @@ TRUST_CF_CONNECTING_IP = env_bool('TRUST_CF_CONNECTING_IP', False)
 
 SESSION_TOKEN_MAX_AGE = 60 * 60 * 6
 PRIVACY_POLICY_VERSION = env('PRIVACY_POLICY_VERSION', '2026-10')
-SESSION_REUSE_WINDOW = 60 * 30
+SESSION_REUSE_WINDOW = 60 * 60 * 24  # mismo contacto: retoma la conversación (y su consumo) en vez de abrir otra con cupo nuevo
 
 # Contrato de precios generado desde src/data/pricing.ts (npm run export:contract).
 PRICING_CONTRACT_PATH = BASE_DIR / 'angside_ai' / 'data' / 'pricing.json'

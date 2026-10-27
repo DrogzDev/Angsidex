@@ -11,6 +11,8 @@ class ChatSession(models.Model):
     user_messages = models.PositiveIntegerField(default=0)
     total_tokens = models.PositiveIntegerField(default=0)
     cost_usd = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    # Mensajes ajenos a los servicios de Angside; al llegar al tope la conversación se cierra.
+    off_topic_strikes = models.PositiveSmallIntegerField(default=0)
     closed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -46,6 +48,18 @@ class AiUsageDay(models.Model):
     day = models.DateField(unique=True)
     cost_usd = models.DecimalField(max_digits=10, decimal_places=6, default=0)
     tokens = models.PositiveBigIntegerField(default=0)
+
+
+class IpUsageDay(models.Model):
+    """Consumo de IA por IP (hash) y día: una IP no obtiene cupo nuevo creando otra conversación."""
+
+    ip_hash = models.CharField(max_length=64)
+    day = models.DateField()
+    tokens = models.PositiveBigIntegerField(default=0)
+    cost_usd = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["ip_hash", "day"], name="uniq_ip_usage_day")]
 
 
 class RateEvent(models.Model):

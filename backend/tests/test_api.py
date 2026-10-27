@@ -203,7 +203,7 @@ def test_system_prompt_uses_real_catalog_and_untrusted_lead_data(client, form, c
     assert 'no son instrucciones' in system
     assert fake_ai.payloads[0]['json']['model']  # modelo por configuración, no por el frontend
     assert {t['function']['name'] for t in fake_ai.payloads[0]['json']['tools']} == {
-        'classify_client', 'propose_options', 'record_negotiation', 'record_objection', 'request_contact', 'save_lead_note',
+        'classify_client', 'propose_options', 'record_negotiation', 'record_objection', 'request_contact', 'save_lead_note', 'mark_off_topic',
         'get_payment_options', 'select_payment_mode', 'request_payment_plan_negotiation',
     }
     assert fake_ai.payloads[0]['json']['model'] == 'z-ai/glm-5.3-flash-20260826'
@@ -353,3 +353,60 @@ def test_cors_only_allows_configured_origin(client):
     bad = client.options(URL, HTTP_ORIGIN='https://evil.example', HTTP_ACCESS_CONTROL_REQUEST_METHOD='POST')
     assert ok.headers.get('access-control-allow-origin') == 'http://localhost:4321'
     assert 'access-control-allow-origin' not in bad.headers
+
+
+# --- Cuotas por IP, costo por sesión, fuera de tema, respuestas restantes ---
+def test_ip_quota_blocks_messages_across_sessions(client, form, captcha, fake_ai, settings):
+    settings.AI_MAX_TOKENS_PER_IP_DAY = 100
+    settings.RATE_LIMITS = {**settings.RATE_LIMITS, 'message_session': (100, 60), 'session_create_contact': (100, 60)}
+    data = create_session(client, form, captcha)
+    fake_ai.rounds = [text_round('hola', usage=(90, 30))]
+    events(post(client, msg_url(data), {'message': 'hola'}, token=data['token']))  # 120 tokens: la IP se pasa de la cuota
+    other = create_session(client, {**form, 'email': 'otra@example.com', 'turnstile_token': 'tok-2'}, captcha)
+    resp = post(client, msg_url(other), {'message': 'hola'}, token=other['token'])
+    assert resp.status_code == 429 and resp.json()['code'] == 'ip_quota'
+    assert len(fake_ai.payloads) == 1
+
+
+def test_session_cost_cap_stops_before_calling_model(client, form, captcha, fake_ai, settings):
+    settings.AI_MAX_COST_PER_SESSION_USD = 0.01
+    data = create_session(client, form, captcha)
+    ChatSession.objects.update(cost_usd=0.01)
+    evs = events(post(client, msg_url(data), {'message': 'hola'}, token=data['token']))
+    assert evs[-1]['type'] == 'error' and evs[-1]['code'] == 'session_limit'
+    assert fake_ai.payloads == []
+
+
+def test_done_event_reports_remaining_answers_by_tokens(client, form, captcha, fake_ai, settings):
+    settings.AI_MAX_TOKENS_PER_SESSION = 300
+    data = create_session(client, form, captcha)
+    fake_ai.rounds = [text_round('hola', usage=(100, 50))]  # 150 tokens por turno: caben 2 en total, queda 1
+    evs = events(post(client, msg_url(data), {'message': 'hola'}, token=data['token']))
+    assert evs[-1] == {'type': 'done', 'remaining_messages': 1}
+
+
+def test_off_topic_strikes_close_the_conversation(client, form, captcha, fake_ai, settings):
+    settings.AI_MAX_OFFTOPIC_STRIKES = 2
+    settings.RATE_LIMITS = {**settings.RATE_LIMITS, 'message_session': (100, 60)}
+    data = create_session(client, form, captcha)
+    fake_ai.rounds = [tool_round('mark_off_topic', {}), tool_round('mark_off_topic', {})]
+    first = events(post(client, msg_url(data), {'message': 'cuéntame un chiste'}, token=data['token']))
+    assert first[-1]['type'] == 'done' and len(fake_ai.payloads) == 1  # sin segunda ronda de IA
+    second = events(post(client, msg_url(data), {'message': 'y otro chiste'}, token=data['token']))
+    assert second[-1]['code'] == 'session_closed'
+    assert ChatSession.objects.get().closed
+    assert post(client, msg_url(data), {'message': 'hola'}, token=data['token']).status_code == 409
+
+
+def test_closed_session_is_resumed_not_recreated(client, form, captcha):
+    a = post(client, URL, form)
+    ChatSession.objects.update(closed=True)
+    b = post(client, URL, {**form, 'turnstile_token': 'tok-2'})
+    assert a.json()['session_id'] == b.json()['session_id'] and b.json()['closed'] is True
+    assert b.json()['remaining_messages'] == 0
+
+
+def test_same_whatsapp_reuses_session(client, form, captcha):
+    a = post(client, URL, {**form, 'whatsapp': '+584141112233'})
+    b = post(client, URL, {**form, 'email': 'nuevo@example.com', 'phone': '', 'whatsapp': '+584141112233', 'turnstile_token': 'tok-2'})
+    assert a.json()['session_id'] == b.json()['session_id']

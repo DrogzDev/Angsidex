@@ -130,7 +130,7 @@ export type StreamEvent =
   | { type: 'contact_requested' }
   | { type: 'price_notice'; message: string }
   | { type: 'error'; code: string; message: string }
-  | { type: 'done' };
+  | { type: 'done'; remaining_messages?: number };
 
 export class ApiError extends Error {
   constructor(

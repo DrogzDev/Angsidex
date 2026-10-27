@@ -301,7 +301,7 @@ function init(root: HTMLElement) {
   }
 
   function updateRemaining() {
-    remainingEl.textContent = remaining > 0 ? `${remaining} mensajes disponibles` : 'Límite alcanzado';
+    remainingEl.textContent = remaining > 0 ? `${remaining} ${remaining === 1 ? 'respuesta disponible' : 'respuestas disponibles'}` : 'Límite alcanzado';
     const off = streaming || remaining <= 0;
     sendBtn.disabled = off;
     input.disabled = remaining <= 0;
@@ -383,10 +383,12 @@ function init(root: HTMLElement) {
           markContactSent();
         } else if (ev.type === 'price_notice') {
           addMessage('notice', ev.message);
+        } else if (ev.type === 'done') {
+          if (typeof ev.remaining_messages === 'number') remaining = ev.remaining_messages;
         } else if (ev.type === 'error') {
           dropTyping();
           addMessage('notice', ev.message);
-          if (ev.code === 'session_limit' || ev.code === 'budget_exhausted') remaining = 0;
+          if (ev.code === 'session_limit' || ev.code === 'budget_exhausted' || ev.code === 'ip_quota' || ev.code === 'session_closed') remaining = 0;
         }
       });
     } catch (err) {
@@ -398,7 +400,7 @@ function init(root: HTMLElement) {
       } else {
         addMessage('notice', api?.message ?? 'Ocurrió un error. Inténtalo de nuevo.');
       }
-      if (api && (api.code === 'session_limit' || api.code === 'budget_exhausted')) remaining = 0;
+      if (api && (api.code === 'session_limit' || api.code === 'budget_exhausted' || api.code === 'ip_quota' || api.code === 'session_closed')) remaining = 0;
       else if (api && api.status === 429 && api.code === 'rate_limited') remaining += 1; // no consumió cupo
     } finally {
       dropTyping();

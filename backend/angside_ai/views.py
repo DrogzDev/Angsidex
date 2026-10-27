@@ -73,7 +73,8 @@ def session_payload(session: ChatSession, **extra) -> dict:
     return {
         'session_id': str(session.id),
         'token': make_token(session),
-        'remaining_messages': max(settings.AI_MAX_USER_MESSAGES_PER_SESSION - session.user_messages, 0),
+        'remaining_messages': 0 if session.closed else limits.remaining_messages(session),
+        'closed': session.closed,
         'profile': proposals.profile_payload(session.lead),
         'messages': messages,
         **extra,
@@ -123,9 +124,11 @@ class SessionCreateView(APIView):
             match |= Q(lead__email__iexact=data['email'])
         if data.get('phone'):
             match |= Q(lead__phone=data['phone'])
-        recent = ChatSession.objects.select_related('lead').filter(match, created_at__gte=since, closed=False).first()
+        if data.get('whatsapp'):
+            match |= Q(lead__whatsapp=data['whatsapp']) | Q(lead__phone=data['whatsapp'])
+        recent = ChatSession.objects.select_related('lead').filter(match, created_at__gte=since).first() if match else None
         if recent:
-            return Response(session_payload(recent), status=status.HTTP_200_OK)
+            return Response(session_payload(recent, resumed=True), status=status.HTTP_200_OK)
 
         with transaction.atomic():
             lead = Lead.objects.create(
@@ -180,12 +183,15 @@ class MessageView(APIView):
         reserved = ChatSession.objects.filter(pk=session.pk, user_messages__lt=settings.AI_MAX_USER_MESSAGES_PER_SESSION).update(user_messages=F('user_messages') + 1)
         if not reserved:
             return err('session_limit', 'Llegamos al límite de mensajes de esta conversación. Puedes pedir que Angside te contacte.', 429)
+        if not limits.ip_quota_available(limits.digest(limits.client_ip(request))):
+            ChatSession.objects.filter(pk=session.pk).update(user_messages=F('user_messages') - 1)
+            return err('ip_quota', 'Alcanzaste el uso diario del asistente desde esta conexión. Puedes usar el cotizador o pedir que te contactemos.', 429)
         if not limits.budget_available():
             ChatSession.objects.filter(pk=session.pk).update(user_messages=F('user_messages') - 1)
             return err('budget_exhausted', 'El asistente no está disponible por ahora. Puedes usar el cotizador o pedir que te contactemos.', 503)
 
         session.refresh_from_db()
-        response = StreamingHttpResponse(sse(run_turn(session, text)), content_type='text/event-stream; charset=utf-8')
+        response = StreamingHttpResponse(sse(run_turn(session, text, limits.digest(limits.client_ip(request)))), content_type='text/event-stream; charset=utf-8')
         response['Cache-Control'] = 'no-cache'
         response['X-Accel-Buffering'] = 'no'
         return response

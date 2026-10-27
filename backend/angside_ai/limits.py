@@ -9,7 +9,7 @@ from django.db import transaction
 from django.db.models import F, Sum
 from django.utils import timezone
 
-from .models import AiUsageDay, RateEvent
+from .models import AiUsageDay, IpUsageDay, RateEvent
 
 
 class RateLimited(Exception):
@@ -75,12 +75,41 @@ def estimate_cost(tokens_in: int, tokens_out: int) -> Decimal:
     return Decimal(str(round(cost, 6)))
 
 
-def record_usage(session, tokens_in: int, tokens_out: int, cost: Decimal | None) -> None:
+def ip_quota_available(ip_hash: str) -> bool:
+    """La IP aún no agotó su cuota diaria de IA (tokens y costo, sumando todas sus conversaciones)."""
+    if not ip_hash:
+        return True
+    row = IpUsageDay.objects.filter(ip_hash=ip_hash, day=_today()).first()
+    if not row:
+        return True
+    return row.tokens < settings.AI_MAX_TOKENS_PER_IP_DAY and row.cost_usd < Decimal(str(settings.AI_MAX_COST_PER_IP_DAY_USD))
+
+
+def session_cost_exceeded(session) -> bool:
+    return session.cost_usd >= Decimal(str(settings.AI_MAX_COST_PER_SESSION_USD))
+
+
+def remaining_messages(session) -> int:
+    """Respuestas que le quedan al visitante: el menor entre el tope de mensajes y lo que alcanza del presupuesto de tokens/costo."""
+    by_count = max(settings.AI_MAX_USER_MESSAGES_PER_SESSION - session.user_messages, 0)
+    if session.user_messages == 0:
+        return by_count
+    avg_tokens = max(session.total_tokens / session.user_messages, 1)
+    avg_cost = max(float(session.cost_usd) / session.user_messages, 1e-9)
+    by_tokens = int(max(settings.AI_MAX_TOKENS_PER_SESSION - session.total_tokens, 0) // avg_tokens)
+    by_cost = int(max(settings.AI_MAX_COST_PER_SESSION_USD - float(session.cost_usd), 0) // avg_cost)
+    return min(by_count, by_tokens, by_cost)
+
+
+def record_usage(session, tokens_in: int, tokens_out: int, cost: Decimal | None, ip_hash: str = "") -> None:
     """Suma el consumo a la sesión y al día. `cost` es el informado por OpenRouter; si falta, se estima."""
     cost = cost if cost is not None else estimate_cost(tokens_in, tokens_out)
     tokens = tokens_in + tokens_out
     with transaction.atomic():
         row, _ = AiUsageDay.objects.get_or_create(day=_today())
         AiUsageDay.objects.filter(pk=row.pk).update(cost_usd=F('cost_usd') + cost, tokens=F('tokens') + tokens)
+        if ip_hash:
+            ip_row, _ = IpUsageDay.objects.get_or_create(ip_hash=ip_hash, day=_today())
+            IpUsageDay.objects.filter(pk=ip_row.pk).update(cost_usd=F("cost_usd") + cost, tokens=F("tokens") + tokens)
         type(session).objects.filter(pk=session.pk).update(total_tokens=F('total_tokens') + tokens, cost_usd=F('cost_usd') + cost)
     session.refresh_from_db(fields=['total_tokens', 'cost_usd'])

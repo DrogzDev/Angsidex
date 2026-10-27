@@ -39,9 +39,11 @@ def build_messages(session: ChatSession) -> list[dict]:
     return out
 
 
-def _over_limits(session: ChatSession) -> str | None:
-    if session.total_tokens >= settings.AI_MAX_TOKENS_PER_SESSION:
+def _over_limits(session: ChatSession, ip_hash: str = '') -> str | None:
+    if session.total_tokens >= settings.AI_MAX_TOKENS_PER_SESSION or limits.session_cost_exceeded(session):
         return 'session_limit'
+    if not limits.ip_quota_available(ip_hash):
+        return 'ip_quota'
     if not limits.budget_available():
         return 'budget_exhausted'
     return None
@@ -49,18 +51,23 @@ def _over_limits(session: ChatSession) -> str | None:
 
 LIMIT_MESSAGES = {
     'session_limit': 'Llegamos al límite de esta conversación. Puedes dejar que Angside te contacte para continuar con una propuesta personalizada.',
+    'ip_quota': 'Alcanzaste el uso diario del asistente desde esta conexión. Puedes usar el cotizador o dejar que Angside te contacte.',
     'budget_exhausted': 'El asistente no está disponible por ahora. Puedes usar el cotizador o pedir que Angside te contacte.',
     'ai_unavailable': 'No pude conectar con el asistente en este momento. Intenta de nuevo en unos minutos o solicita que te contactemos.',
 }
 
 
-def run_turn(session: ChatSession, user_text: str) -> Iterator[dict]:
+OFF_TOPIC_TEXT = 'Solo puedo ayudarte con los servicios de Angside: páginas web, tiendas online, sistemas y automatizaciones. ¿Qué necesita tu negocio?'
+OFF_TOPIC_CLOSED_TEXT = 'Esta conversación se cerró porque los mensajes no están relacionados con los servicios de Angside. Si necesitas algo de tu negocio, usa el cotizador o escríbenos por WhatsApp.'
+
+
+def run_turn(session: ChatSession, user_text: str, ip_hash: str = '') -> Iterator[dict]:
     ChatMessage.objects.create(session=session, role=ChatMessage.Role.USER, content=user_text)
     produced_text = False
     texts: list[str] = []
 
     for round_no in range(MAX_ROUNDS):
-        problem = _over_limits(session)
+        problem = _over_limits(session, ip_hash)
         if problem:
             yield {'type': 'error', 'code': problem, 'message': LIMIT_MESSAGES[problem]}
             return
@@ -84,7 +91,7 @@ def run_turn(session: ChatSession, user_text: str) -> Iterator[dict]:
             return
 
         u = result['usage']
-        limits.record_usage(session, u['in'], u['out'], u['cost'])
+        limits.record_usage(session, u['in'], u['out'], u['cost'], ip_hash)
 
         calls = [
             {'id': tc['id'] or f'call_{uuid.uuid4().hex[:12]}', 'type': 'function', 'function': {'name': tc['name'], 'arguments': tc['arguments'] or '{}'}}
@@ -106,6 +113,20 @@ def run_turn(session: ChatSession, user_text: str) -> Iterator[dict]:
             ChatMessage.objects.create(session=session, role=ChatMessage.Role.TOOL, content=_dump(outcome), meta=meta)
             yield from evs
 
+        if any(c['function']['name'] == 'mark_off_topic' for c in calls):
+            # Mensaje ajeno al negocio: se corta aquí (sin otra ronda de IA) y, si el modelo no escribió respuesta, se usa texto fijo.
+            session.refresh_from_db(fields=['off_topic_strikes'])
+            if session.off_topic_strikes >= settings.AI_MAX_OFFTOPIC_STRIKES:
+                ChatSession.objects.filter(pk=session.pk).update(closed=True)
+                ChatMessage.objects.create(session=session, role=ChatMessage.Role.ASSISTANT, content=OFF_TOPIC_CLOSED_TEXT)
+                yield {'type': 'error', 'code': 'session_closed', 'message': OFF_TOPIC_CLOSED_TEXT}
+                return
+            if not produced_text:
+                ChatMessage.objects.create(session=session, role=ChatMessage.Role.ASSISTANT, content=OFF_TOPIC_TEXT)
+                yield {'type': 'delta', 'text': OFF_TOPIC_TEXT}
+            yield _done(session)
+            return
+
     if not produced_text:
         ChatMessage.objects.create(session=session, role=ChatMessage.Role.ASSISTANT, content=FALLBACK_TEXT)
         yield {'type': 'delta', 'text': FALLBACK_TEXT}
@@ -113,7 +134,12 @@ def run_turn(session: ChatSession, user_text: str) -> Iterator[dict]:
         notice = _price_notice(session, ''.join(texts))
         if notice:
             yield notice
-    yield {'type': 'done'}
+    yield _done(session)
+
+
+def _done(session: ChatSession) -> dict:
+    session.refresh_from_db(fields=['user_messages', 'total_tokens', 'cost_usd'])
+    return {'type': 'done', 'remaining_messages': limits.remaining_messages(session)}
 
 
 def _price_notice(session: ChatSession, text: str) -> dict | None:
