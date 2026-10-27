@@ -1,6 +1,10 @@
 ---
 import Icon from '../Icon.astro';
 import HeroWireframe from '../graphics/HeroWireframe.astro';
+import { contactUrls } from '../../config/site';
+
+/** El asesor de IA solo existe si hay backend configurado; si no, el CTA principal lleva a la calculadora. */
+const aiEnabled = !!import.meta.env.PUBLIC_API_URL;
 
 /** Datos verificables (sin cifras de clientes ni proyectos). */
 const facts = [
@@ -26,12 +30,21 @@ const facts = [
           Desarrollamos páginas web, tiendas online y sistemas personalizados para negocios en Venezuela que quieren crecer.
         </p>
         <div class="actions" data-hero>
-          <a href="#calculadora" class="btn btn-dark">Solicitar propuesta <Icon name="arrow-right" size={14} /></a>
-          <a href="#servicios" class="btn btn-ghost">
-            <span class="d">Ver nuestros servicios</span><span class="m">Ver servicios</span>
-            <Icon name="arrow-up-right" size={14} class="blue" />
-          </a>
+          {aiEnabled ? (
+            <button type="button" class="btn btn-dark primary" data-open-advisor>
+              <Icon name="message-square-text" size={15} /> Cotizar con IA <Icon name="arrow-right" size={14} />
+            </button>
+          ) : (
+            <a href="#calculadora" class="btn btn-dark primary">Cotizar mi proyecto <Icon name="arrow-right" size={14} /></a>
+          )}
+          {aiEnabled && <a href="#calculadora" class="btn btn-ghost alt"><Icon name="calculator" size={15} /> Calcular presupuesto</a>}
+          {contactUrls.whatsapp && (
+            <a href={contactUrls.whatsapp} class="btn btn-ghost alt" target="_blank" rel="noopener">
+              <Icon name="message-circle" size={15} /> WhatsApp
+            </a>
+          )}
         </div>
+        <p class="quick mono" data-hero>Sin compromiso · Estimado al instante · Desde $120 USD</p>
       </div>
 
       <div class="art" aria-hidden="false">
@@ -63,11 +76,11 @@ const facts = [
   .line { display: block; overflow: hidden; padding-block: 0.02em; }
   .inner { display: block; }
   .desc { margin: clamp(12px, 1.6vw, 20px) 0 0; max-width: 31rem; color: var(--color-muted); font-size: 13.5px; line-height: 1.55; }
-  .actions { display: flex; align-items: center; gap: 22px; margin-top: clamp(18px, 2.4vw, 32px); flex-wrap: wrap; }
-  .actions .btn-dark { min-height: 40px; padding-inline: 20px; }
-  .actions .btn-ghost { font-weight: 500; }
-  .actions :global(.blue) { color: var(--color-blue); }
-  .m { display: none; }
+  .actions { display: flex; align-items: center; gap: 12px; margin-top: clamp(18px, 2.4vw, 32px); flex-wrap: wrap; }
+  .actions .btn { min-height: 44px; padding-inline: 18px; font-weight: 500; gap: 8px; }
+  .actions .btn-dark { padding-inline: 22px; }
+  .actions .alt { border: 1px solid var(--color-line); background: #fff; }
+  .quick { margin: 12px 0 0; font-size: 10px; color: var(--color-muted); }
 
   .art { position: relative; min-height: 100%; }
   .art-inner { width: min(100%, 360px); margin: clamp(0px, 1vw, 12px) 0 0 clamp(8px, 4vw, 70px); will-change: transform; }
@@ -101,11 +114,10 @@ const facts = [
     .hero { padding-top: 8px; }
     .title { font-size: clamp(3.2rem, 16.2vw, 5.4rem); }
     .desc { font-size: 14.5px; max-width: none; }
-    .actions { gap: 12px; flex-wrap: nowrap; }
-    .actions .btn { min-height: 46px; }
-    .actions .btn-ghost { border: 1px solid var(--color-line); background: #fff; padding-inline: 18px; }
-    .actions .btn-ghost .ico { display: none; }
-    .d { display: none; } .m { display: inline; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .actions .btn { min-height: 48px; padding-inline: 12px; justify-content: center; }
+    .actions .primary { grid-column: 1 / -1; }
+    .quick { font-size: 9.5px; }
     .art-inner { width: min(62%, 240px); }
     .side { font-size: 8px; }
     .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; order: 1; margin-top: 22px; }

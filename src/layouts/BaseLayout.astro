@@ -8,10 +8,11 @@ import { site } from '../config/site';
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
-const { title = 'Angside — Soluciones digitales a medida', description = site.description } = Astro.props;
+const { title = 'Angside — Soluciones digitales a medida', description = site.description, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site.url).toString();
-const ogImage = new URL('/brand/logo_horizontal_light.svg', site.url).toString();
+const ogImage = new URL('/media/estudio.webp', site.url).toString();
 ---
 
 <!doctype html>
@@ -22,7 +23,13 @@ const ogImage = new URL('/brand/logo_horizontal_light.svg', site.url).toString()
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f1f1f1" />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1'} />
+    <meta name="author" content={site.name} />
+    <meta name="geo.region" content="VE" />
+    <meta name="geo.placename" content="Venezuela" />
     <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es-VE" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta property="og:type" content="website" />
@@ -31,7 +38,15 @@ const ogImage = new URL('/brand/logo_horizontal_light.svg', site.url).toString()
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:locale" content="es_VE" />
+    <meta property="og:image:width" content="1600" />
+    <meta property="og:image:height" content="1200" />
+    <meta property="og:image:alt" content="Estudio de Angside" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <slot name="head" />
     <script is:inline>
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('js-anim');
     </script>

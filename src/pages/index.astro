@@ -8,10 +8,64 @@ import Projects from '../components/sections/Projects.astro';
 import CalculatorSection from '../components/sections/CalculatorSection.astro';
 import Hosting from '../components/sections/Hosting.astro';
 import Pricing from '../components/sections/Pricing.astro';
+import Faq from '../components/sections/Faq.astro';
 import Contact from '../components/sections/Contact.astro';
+import { faqs } from '../data/faq';
+import { services } from '../data/services';
+import { site, contactUrls } from '../config/site';
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const businessLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${site.url}/#organization`,
+  name: site.name,
+  url: site.url,
+  logo: `${site.url}/brand/isotipo_light_transparente_2048.svg`,
+  image: `${site.url}/media/estudio.webp`,
+  description: site.description,
+  areaServed: { '@type': 'Country', name: 'Venezuela' },
+  priceRange: '$$',
+  knowsLanguage: 'es',
+  sameAs: [contactUrls.instagram, contactUrls.tiktok].filter(Boolean),
+  contactPoint: contactUrls.whatsapp
+    ? [{ '@type': 'ContactPoint', contactType: 'sales', telephone: `+${site.contact.whatsapp}`, availableLanguage: 'es', url: contactUrls.whatsapp }]
+    : undefined,
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios de desarrollo de software',
+    itemListElement: services.map((s) => ({
+      '@type': 'Offer',
+      priceCurrency: 'USD',
+      price: s.from,
+      itemOffered: { '@type': 'Service', name: s.name, description: s.description },
+    })),
+  },
+};
+
+const siteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  url: site.url,
+  name: site.name,
+  inLanguage: 'es-VE',
+  publisher: { '@id': `${site.url}/#organization` },
+};
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="Angside — Desarrollo de páginas web, tiendas online y sistemas en Venezuela"
+  description="Diseñamos páginas web, tiendas online, sistemas a medida y automatizaciones en Venezuela. Cotiza con IA o con nuestra calculadora y recibe un estimado al instante, desde $120 USD."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(businessLd)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(siteLd)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} slot="head" />
   <Hero />
   <Services />
   <About />
@@ -20,5 +74,6 @@ import Contact from '../components/sections/Contact.astro';
   <CalculatorSection />
   <Hosting />
   <Pricing />
+  <Faq />
   <Contact />
 </BaseLayout>
