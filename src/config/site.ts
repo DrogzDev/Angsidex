@@ -4,6 +4,8 @@
  */
 export const site = {
   name: 'Angside',
+  /** El dominio y las redes usan "Angsidex": se declara como nombre alternativo para que buscadores no los separen. */
+  alternateName: 'Angsidex',
   /** Dominio público (se usa en canonical, sitemap y Open Graph). */
   url: 'https://angsidex.com',
   description:

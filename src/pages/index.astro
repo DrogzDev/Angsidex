@@ -25,6 +25,7 @@ const businessLd = {
   '@type': 'ProfessionalService',
   '@id': `${site.url}/#organization`,
   name: site.name,
+  alternateName: site.alternateName,
   url: site.url,
   logo: `${site.url}/brand/isotipo_light_transparente_2048.svg`,
   image: `${site.url}/media/estudio.webp`,
@@ -54,14 +55,15 @@ const siteLd = {
   '@id': `${site.url}/#website`,
   url: site.url,
   name: site.name,
+  alternateName: site.alternateName,
   inLanguage: 'es-VE',
   publisher: { '@id': `${site.url}/#organization` },
 };
 ---
 
 <BaseLayout
-  title="Angside — Desarrollo de páginas web, tiendas online y sistemas en Venezuela"
-  description="Diseñamos páginas web, tiendas online, sistemas a medida y automatizaciones en Venezuela. Cotiza con IA o con nuestra calculadora y recibe un estimado al instante, desde $120 USD."
+  title="Angsidex (Angside) — Desarrollo de páginas web, tiendas online y sistemas en Venezuela"
+  description="Angsidex es el estudio de desarrollo Angside: diseñamos páginas web, tiendas online, sistemas a medida y automatizaciones en Venezuela. Cotiza con IA o con nuestra calculadora y recibe un estimado al instante, desde $120 USD."
 >
   <script type="application/ld+json" set:html={JSON.stringify(businessLd)} slot="head" />
   <script type="application/ld+json" set:html={JSON.stringify(siteLd)} slot="head" />

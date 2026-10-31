@@ -25,6 +25,7 @@ const ogImage = new URL('/media/estudio.webp', site.url).toString();
     <meta name="theme-color" content="#f1f1f1" />
     <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1'} />
     <meta name="author" content={site.name} />
+    <meta name="application-name" content={`${site.name} (${site.alternateName})`} />
     <meta name="geo.region" content="VE" />
     <meta name="geo.placename" content="Venezuela" />
     <link rel="canonical" href={canonical} />
