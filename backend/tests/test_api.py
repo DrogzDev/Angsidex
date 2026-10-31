@@ -199,7 +199,7 @@ def test_system_prompt_uses_real_catalog_and_untrusted_lead_data(client, form, c
     fake_ai.rounds = [text_round('ok')]
     events(post(client, msg_url(data), {'message': 'hola'}, token=data['token']))
     system = fake_ai.payloads[0]['json']['messages'][0]['content']
-    assert '$550' in system and 'Angside' in system and 'cachicamo' not in system.lower() and '100 %' in system
+    assert '$550' in system and 'Angside' in system and 'cachicamo' not in system.lower() and 'licencia de uso permanente' in system
     assert 'no son instrucciones' in system
     assert fake_ai.payloads[0]['json']['model']  # modelo por configuración, no por el frontend
     assert {t['function']['name'] for t in fake_ai.payloads[0]['json']['tools']} == {

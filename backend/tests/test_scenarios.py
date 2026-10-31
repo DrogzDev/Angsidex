@@ -231,12 +231,12 @@ def test_8_cliente_que_desconfia_de_contratar_un_desarrollador(client, form, cap
         client, data, fake_ai, 'No sé, me da miedo pagar y que el programador se pierda o me quede amarrado',
         tool_round('record_objection', {'category': 'trust', 'detail': 'Teme que el programador desaparezca'}, 'o1'),
         tool_round('record_objection', {'category': 'ownership', 'detail': 'Teme quedar amarrado al desarrollador'}, 'o2'),
-        text_round('Se paga en dos partes: una para arrancar y otra cuando ya ves todo funcionando. Y el sistema es 100 % tuyo.'),
+        text_round('Se paga en dos partes: una para arrancar y otra cuando ya ves todo funcionando. Y tienes licencia de uso permanente.'),
     )
     assert not any(e['type'] == 'proposals' for e in evs)
     assert [o['category'] for o in Lead.objects.get().objections] == ['trust', 'ownership']
     system = fake_ai.payloads[0]['json']['messages'][0]['content']
-    assert '100 % del cliente' in system and 'otros programadores' in system and 'dos partes' in system
+    assert 'licencia de uso permanente' in system and 'propiedad de Angside' in system and 'dos partes' in system
     assert not [e for e in evs if e['type'] == 'price_notice']  # no hay montos inventados
 
 

@@ -93,7 +93,7 @@ PAYMENT_CONTEXT = re.compile(r'descuento|rebaja|incremento|recargo|aumento|inici
 
 def allowed_percents(session) -> set[float]:
     """Porcentajes de pago que sí existen: los de la configuración vigente, los de la versión de cada propuesta y los que dijo el visitante."""
-    out: set[float] = {100.0}  # "el sistema es 100 % tuyo"
+    out: set[float] = {100.0}  # "100 %" como total del pago
     configs = [services.current_config()]
     for version in {p.pricing_version for p in session.lead.proposals.all() if p.pricing_version}:
         old = services.config_for_version(version)
