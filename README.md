@@ -37,7 +37,7 @@ Mientras estén vacíos, los enlaces se muestran como "Próximamente" y el botó
 - Los precios son propuestas iniciales; confirmar tarifas finales.
 - Reparto del pago del desarrollo: hoy 50 % para arrancar y 50 % al entregar (`paymentSplit` en `src/data/pricing.ts`).
 - Planes de Cachicamo (`billingPlans`): precios y características copiados de su oferta pública; verificar con el proveedor y actualizar si cambian.
-- Textos de condiciones (`projectTerms`: propiedad 100 % del cliente, formalización por escrito, marco legal venezolano): revisarlos con asesoría legal antes de publicar.
+- Textos de condiciones (`projectTerms`: licencia de uso permanente para el cliente con código fuente propiedad de Angside, formalización por escrito, marco legal venezolano): revisarlos con asesoría legal antes de publicar.
 
 ## Asistente de IA (Angside AI Advisor)
 

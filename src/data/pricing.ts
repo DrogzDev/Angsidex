@@ -203,7 +203,7 @@ export const costNotes: readonly string[] = [
 /** Condiciones del proyecto mostradas junto al cotizador. Revisar con asesoría legal antes de publicar. */
 export const projectTerms: ReadonlyArray<{ title: string; text: string }> = [
   { title: 'Pago en dos partes', text: 'Una parte para arrancar el desarrollo y la otra al culminar, cuando ya ves todo funcionando.' },
-  { title: 'El sistema es 100 % tuyo', text: 'Una vez completado el pago, el sistema te pertenece: recibes el código y la documentación, y puedes contratar a otros programadores para mantenerlo o ampliarlo.' },
+  { title: 'Licencia de uso permanente', text: 'Una vez completado el pago, tu sistema queda activo y tienes licencia de uso permanente para tu negocio. Tus datos son tuyos y puedes exportarlos cuando quieras. El código fuente es propiedad de Angside; la entrega del código se puede acordar por separado.' },
   { title: 'Todo por escrito', text: 'El alcance, los pagos, los plazos y la propiedad del sistema quedan en una propuesta o contrato formal, conforme a la normativa venezolana aplicable.' },
   { title: 'Facturación digital y terceros', text: 'La facturación digital la configuramos y la gestionamos nosotros (de $20 a $55 al mes según la magnitud de tu empresa). Hosting, dominio y servicios como WhatsApp se rigen por las condiciones de cada proveedor; el cumplimiento fiscal ante el SENIAT se evalúa aparte.' },
 ];

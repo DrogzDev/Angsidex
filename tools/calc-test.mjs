@@ -99,7 +99,7 @@ ok('mensual incluye facturación $30 fijo', (await txt('#out-month')).includes('
 ok('desarrollo no incluye el plan ($830)', (await txt('#out-dev')).includes('$830'), await txt('#out-dev'));
 await p.click('#btn-copy');
 const t = await p.evaluate(() => navigator.clipboard.readText());
-ok('resumen: 2 pagos y facturación, sin textos legales de cierre', t.includes('2 pagos') && t.includes('Facturación digital, plan Pymes') && !t.includes('100 % tuyo'));
+ok('resumen: 2 pagos y facturación, sin textos legales de cierre', t.includes('2 pagos') && t.includes('Facturación digital, plan Pymes') && !t.includes('licencia de uso'));
 ok('bloque de condiciones visible', await p.locator('#terms-title').isVisible());
 await p.locator('#calculadora').screenshot({ path: process.argv[3] ?? 'calc.png' });
 

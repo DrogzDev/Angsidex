@@ -172,7 +172,7 @@ describe('resumen, validación y URL', () => {
     expect(text).toContain('Para arrancar el desarrollo: $320 USD');
     expect(text).toContain('Al culminar, con todo funcionando: $320 USD');
     expect(text).toContain('MENSUAL: desde $15 USD/mes');
-    expect(text).not.toContain('100 % tuyo');
+    expect(text).not.toContain('licencia de uso');
     expect(text).not.toContain('sujeto a alcance');
   });
   it('validateState detecta combinaciones inválidas', () => {
